@@ -1,8 +1,10 @@
 package models
 
 import (
+	"context"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -39,6 +41,6 @@ func NewChannel(collection *mongo.Collection) *Channel {
 	}
 }
 
-func (c *Channel) FindByChannelId(channelId int) error {
-	return nil
+func (c *Channel) FindByChannelId(ctx context.Context, channelId int) error {
+	return c.collection.FindOne(ctx, bson.M{"channelId": channelId}).Decode(c)
 }

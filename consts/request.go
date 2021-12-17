@@ -1,5 +1,5 @@
 package consts
 
 const (
-	CTXChannelId = "channelId"
+	CtxChannelId = "channelId"
 )
