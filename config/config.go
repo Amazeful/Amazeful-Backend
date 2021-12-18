@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"flag"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -11,6 +12,7 @@ import (
 type ServerConfig struct {
 	IpAddress string
 	Port      string
+	TLS       bool
 	CertPath  string
 	KeyPath   string
 	MongoURI  string
@@ -27,6 +29,11 @@ var config *ServerConfig = initialConfig
 
 //LoadConfig loads all config data into ServerConfig
 func LoadConfig() error {
+	flag.BoolVar(&config.TLS, "tls", false, "use ssl")
+	flag.Parse()
+	if config.TLS && (config.CertPath == "" || config.KeyPath == "") {
+		return errors.New("to use ssl, you must provide CertPath and KeyPath")
+	}
 	err := godotenv.Load()
 	if err != nil {
 		return err
