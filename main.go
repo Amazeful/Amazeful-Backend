@@ -8,6 +8,7 @@ import (
 
 	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/Amazeful/Amazeful-Backend/handlers/channel"
+	"github.com/Amazeful/Amazeful-Backend/handlers/user"
 	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -56,7 +57,8 @@ func main() {
 	r.Use(middleware.Timeout(30 * time.Second))
 
 	//setup routes
-	r.Route("/channel", channel.ChannelRoutes)
+	r.Route("/channel", channel.ProcessRoutes)
+	r.Route("/user", user.ProcessRoutes)
 
 	if config.TLS {
 		err = http.ListenAndServeTLS(config.IpAddress+":"+config.Port, config.CertPath, config.KeyPath, r)
