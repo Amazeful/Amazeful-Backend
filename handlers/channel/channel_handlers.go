@@ -14,7 +14,7 @@ func HandleGetChannel(rw http.ResponseWriter, req *http.Request) {
 
 	channel := models.NewChannel(collection)
 
-	err := channel.FindByChannelId(req.Context(), 123)
+	err := channel.FindByChannelId(req.Context(), 12345)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrRetrieveData)
 		return
@@ -35,7 +35,7 @@ func HandleCreateChannel(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = channel.Insert(req.Context())
+	err = channel.Create(req.Context())
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrInsert)
 		return

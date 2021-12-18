@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -29,27 +28,20 @@ type Channel struct {
 	StartedAt    time.Time `bson:"startedAt,omitempty" json:"startedAt"`
 	EndedAt      time.Time `bson:"endedAt,omitempty" json:"endedAt"`
 	Moderator    bool      `bson:"moderator" json:"moderator"`
-
-	collection *mongo.Collection
 }
 
 func NewChannel(collection *mongo.Collection) *Channel {
 	return &Channel{
-		collection: collection,
+		BaseModel: BaseModel{
+			collection: collection,
+		},
 	}
 }
 
 func (c *Channel) FindByChannelId(ctx context.Context, channelId int) error {
-	return c.collection.FindOne(ctx, bson.M{"channelId": channelId}).Decode(c)
+	return c.FindOne(ctx, bson.M{"channelId": channelId}, c)
 }
 
-func (c *Channel) Insert(ctx context.Context) error {
-	c.BaseModel.Create()
-	result, err := c.collection.InsertOne(ctx, c)
-	if err != nil {
-		return err
-	}
-
-	c.ID = result.InsertedID.(primitive.ObjectID)
-	return nil
+func (c *Channel) Create(ctx context.Context) error {
+	return c.Insert(ctx, c)
 }

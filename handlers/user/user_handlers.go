@@ -35,7 +35,7 @@ func HandleCreateUser(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = user.Insert(req.Context())
+	err = user.Create(req.Context())
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrInsert)
 		return

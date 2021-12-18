@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -23,27 +22,21 @@ type User struct {
 	ViewCount       int    `bson:"viewCount" json:"viewCount"`
 	Suspended       bool   `bson:"suspended" json:"suspended"`
 	Admin           bool   `bson:"admin" json:"admin"`
-
-	collection *mongo.Collection
 }
 
 func NewUser(collection *mongo.Collection) *User {
 	return &User{
-		collection: collection,
+		BaseModel: BaseModel{
+			collection: collection,
+		},
 	}
 }
 
 func (u *User) FindByUserId(ctx context.Context, userId int) error {
-	return u.collection.FindOne(ctx, bson.M{"userId": userId}).Decode(u)
+	return u.FindOne(ctx, bson.M{"userId": userId}, u)
+
 }
 
-func (u *User) Insert(ctx context.Context) error {
-	u.BaseModel.Create()
-	result, err := u.collection.InsertOne(ctx, u)
-	if err != nil {
-		return err
-	}
-
-	u.ID = result.InsertedID.(primitive.ObjectID)
-	return nil
+func (u *User) Create(ctx context.Context) error {
+	return u.Insert(ctx, u)
 }

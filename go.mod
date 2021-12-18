@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.8.1
 	go.uber.org/zap v1.19.1
 )
@@ -11,7 +12,6 @@ require (
 require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
