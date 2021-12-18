@@ -12,25 +12,23 @@ import (
 type Channel struct {
 	BaseModel `bson:",inline"`
 
-	ChannelId    int                  `bson:"channelId" json:"channelId"`
-	Login        string               `bson:"login" json:"login"`
-	DisplayName  string               `bson:"displayName" json:"displayName"`
-	Language     string               `bson:"language" json:"language"`
-	GameId       string               `bson:"gameId" json:"gameId"`
-	GameName     string               `bson:"gameName" json:"gameName"`
-	Title        string               `bson:"title" json:"title"`
-	Joined       bool                 `bson:"joined" json:"joined"`
-	Silenced     bool                 `bson:"silenced" json:"silenced"`
-	AccessToken  string               `bson:"accessToken,omitempty" json:"accessToken"`
-	RefreshToken string               `bson:"refreshToken,omitempty" json:"refreshToken"`
-	Prefix       string               `bson:"prefix" json:"prefix"`
-	Live         bool                 `bson:"live" json:"live"`
-	Shard        int                  `bson:"shard" json:"shard"`
-	StartedAt    time.Time            `bson:"startedAt,omitempty" json:"startedAt"`
-	EndedAt      time.Time            `bson:"endedAt,omitempty" json:"endedAt"`
-	Moderator    bool                 `bson:"moderator" json:"moderator"`
-	Owner        primitive.ObjectID   `bson:"owner" json:"-"`
-	Managers     []primitive.ObjectID `bson:"managers" json:"-"`
+	ChannelId    int       `bson:"channelId" json:"channelId"`
+	Login        string    `bson:"login" json:"login"`
+	DisplayName  string    `bson:"displayName" json:"displayName"`
+	Language     string    `bson:"language" json:"language"`
+	GameId       string    `bson:"gameId" json:"gameId"`
+	GameName     string    `bson:"gameName" json:"gameName"`
+	Title        string    `bson:"title" json:"title"`
+	Joined       bool      `bson:"joined" json:"joined"`
+	Silenced     bool      `bson:"silenced" json:"silenced"`
+	AccessToken  string    `bson:"accessToken,omitempty" json:"accessToken"`
+	RefreshToken string    `bson:"refreshToken,omitempty" json:"refreshToken"`
+	Prefix       string    `bson:"prefix" json:"prefix"`
+	Live         bool      `bson:"live" json:"live"`
+	Shard        int       `bson:"shard" json:"shard"`
+	StartedAt    time.Time `bson:"startedAt,omitempty" json:"startedAt"`
+	EndedAt      time.Time `bson:"endedAt,omitempty" json:"endedAt"`
+	Moderator    bool      `bson:"moderator" json:"moderator"`
 
 	collection *mongo.Collection
 }
@@ -43,4 +41,15 @@ func NewChannel(collection *mongo.Collection) *Channel {
 
 func (c *Channel) FindByChannelId(ctx context.Context, channelId int) error {
 	return c.collection.FindOne(ctx, bson.M{"channelId": channelId}).Decode(c)
+}
+
+func (c *Channel) Insert(ctx context.Context) error {
+	c.BaseModel.Create()
+	result, err := c.collection.InsertOne(ctx, c)
+	if err != nil {
+		return err
+	}
+
+	c.ID = result.InsertedID.(primitive.ObjectID)
+	return nil
 }
