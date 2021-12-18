@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Amazeful/Amazeful-Backend/config"
+	"github.com/Amazeful/Amazeful-Backend/handlers/auth"
 	"github.com/Amazeful/Amazeful-Backend/handlers/channel"
 	"github.com/Amazeful/Amazeful-Backend/handlers/user"
 	"github.com/Amazeful/Amazeful-Backend/util"
@@ -57,6 +58,7 @@ func main() {
 	r.Use(middleware.Timeout(30 * time.Second))
 
 	//setup routes
+	r.Route("/auth", auth.ProcessRoutes)
 	r.Route("/channel", channel.ProcessRoutes)
 	r.Route("/user", user.ProcessRoutes)
 
