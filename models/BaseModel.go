@@ -38,7 +38,13 @@ func (bm *BaseModel) Insert(ctx context.Context, document interface{}) error {
 }
 
 func (bm *BaseModel) FindOne(ctx context.Context, filter primitive.M, document interface{}) error {
-	return bm.collection.FindOne(ctx, filter).Decode(document)
+	err := bm.collection.FindOne(ctx, filter).Decode(document)
+	if err != nil {
+		return err
+	}
+
+	bm.isLoaded = true
+	return nil
 }
 
 func (bm *BaseModel) Loaded() bool {
