@@ -11,6 +11,7 @@ import (
 )
 
 //ServerConfig includes all config data used by the web server
+//and config coming from env variables
 type ServerConfig struct {
 	IpAddress   string
 	Port        string
@@ -19,8 +20,7 @@ type ServerConfig struct {
 	KeyPath     string
 	MongoURI    string
 	TokenSecret string
-
-	Twitch Twitch
+	Twitch      *Twitch
 }
 
 type Twitch struct {
@@ -37,7 +37,7 @@ var initialConfig = &ServerConfig{
 	Port:      "8000",
 	CertPath:  "",
 	KeyPath:   "",
-	Twitch: Twitch{
+	Twitch: &Twitch{
 		Scopes:      []string{"user:read:email"},
 		RedirectURL: "http://localhost:8000/auth/twitch/callback",
 	},
@@ -47,18 +47,27 @@ var config *ServerConfig = initialConfig
 
 //LoadConfig loads all config data into ServerConfig
 func LoadConfig() error {
+	//Get the flags
 	flag.BoolVar(&config.TLS, "tls", false, "use ssl")
 	flag.Parse()
+
+	//check cert
 	if config.TLS && (config.CertPath == "" || config.KeyPath == "") {
 		return errors.New("to use ssl, you must provide CertPath and KeyPath")
 	}
+
+	// load dotenv
 	err := godotenv.Load()
 	if err != nil {
 		return err
 	}
+
+	//check db info
 	if os.Getenv("MONGO_URI") == "" {
 		return errors.New("missing required env variable MONGO_URI")
 	}
+
+	//set config
 	config.MongoURI = os.Getenv("MONGO_URI")
 	config.Twitch.ClientID = os.Getenv("CLIENT_ID")
 	config.Twitch.ClientSecret = os.Getenv("CLIENT_SECRET")
@@ -72,10 +81,16 @@ func LoadConfig() error {
 		RedirectURL:  config.Twitch.RedirectURL,
 		Scopes:       config.Twitch.Scopes,
 	}
+
 	return nil
 }
 
 //GetConfig returns server config
 func GetConfig() *ServerConfig {
 	return config
+}
+
+//GetTwitchConfig returns twitch config
+func GetTwitchConfig() *Twitch {
+	return config.Twitch
 }
