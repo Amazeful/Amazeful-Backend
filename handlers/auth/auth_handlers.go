@@ -11,12 +11,13 @@ import (
 )
 
 func HandleTwitchLogin(rw http.ResponseWriter, req *http.Request) {
-	twitchConfig := config.GetTwitchConfig()
-	http.Redirect(rw, req, twitchConfig.OauthConfig.AuthCodeURL(twitchConfig.State), http.StatusTemporaryRedirect)
+	twitchOauthConfig := config.GetTwitchOauthConfig()
+	http.Redirect(rw, req, twitchOauthConfig.AuthCodeURL(config.GetTwitchConfig().State), http.StatusTemporaryRedirect)
 }
 
 func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 	twitchConfig := config.GetTwitchConfig()
+	twitchOauthConfig := config.GetTwitchOauthConfig()
 
 	receivedState := req.URL.Query().Get("state")
 	code := req.URL.Query().Get("code")
@@ -26,7 +27,7 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	token, err := twitchConfig.OauthConfig.Exchange(req.Context(), code)
+	token, err := twitchOauthConfig.Exchange(req.Context(), code)
 
 	if err != nil {
 		util.WriteError(rw, err, http.StatusUnauthorized, consts.ErrStrUnauthorized)

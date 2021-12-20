@@ -3,7 +3,7 @@ package models
 import (
 	"context"
 
-	"github.com/nicklaw5/helix"
+	"github.com/nicklaw5/helix/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -44,12 +44,18 @@ func (u *User) Create(ctx context.Context) error {
 
 func (u *User) GetUserFromTwitch(accessToken string) error {
 	client, err := helix.NewClient(&helix.Options{
-		accessToken: accessToken,
+		UserAccessToken: accessToken,
 	})
-
 	if err != nil {
 		return err
 	}
 
-	return nill
+	users, err := client.GetUsers(nil)
+	if err != nil {
+		return err
+	}
+
+	user := users.Data.Users[0]
+
+	return nil
 }
