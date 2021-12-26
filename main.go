@@ -34,19 +34,21 @@ func main() {
 		zap.L().Fatal("failed to load config", zap.Error(err))
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
 	//setup database
 	zap.L().Info("starting database")
-	err = util.InitDB()
+	err = util.InitDB(ctx)
 	if err != nil {
 		zap.L().Fatal("failed to init db", zap.Error(err))
 	}
 	client := util.GetDB()
-	defer client.Disconnect(context.Background())
-	err = client.Ping(context.Background(), nil)
-	if err != nil {
-		zap.L().Fatal("connection to db failed", zap.Error(err))
-	}
+	defer client.Disconnect(ctx)
 
+	err = util.InitRedis(ctx)
+	if err != nil {
+		zap.L().Fatal("failed to init redis", zap.Error(err))
+	}
 	//setup server
 	zap.L().Info("starting server")
 	config := config.GetConfig()
@@ -59,7 +61,7 @@ func main() {
 
 	//setup routes
 	r.Route("/auth", auth.ProcessRoutes)
-	r.Route("/channel", channel.ProcessRoutes)
+	r.With(auth.Authenticator).Route("/channel", channel.ProcessRoutes)
 	r.Route("/user", user.ProcessRoutes)
 
 	if config.TLS {

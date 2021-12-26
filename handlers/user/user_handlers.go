@@ -14,7 +14,7 @@ func HandleGetUser(rw http.ResponseWriter, req *http.Request) {
 
 	user := models.NewUser(collection)
 
-	err := user.FindByUserId(req.Context(), 123)
+	err := user.FindByUserId(req.Context(), "123")
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrRetrieveData)
 		return

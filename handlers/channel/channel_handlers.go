@@ -43,3 +43,16 @@ func HandleCreateChannel(rw http.ResponseWriter, req *http.Request) {
 
 	util.WriteResponse(rw, util.Response{Status: http.StatusCreated, Data: channel})
 }
+
+// func HandleUpdateChannel(rw http.ResponseWriter, req *http.Request) {
+// 	updatedChannel := &models.Channel{}
+// 	err := json.NewDecoder(req.Body).Decode(updatedChannel)
+// 	if err != nil {
+// 		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDecode)
+// 		return
+// 	}
+
+// 	collection := util.GetCollection(consts.CollectionChannel)
+// 	channel = models.NewChannel(collection)
+
+// }

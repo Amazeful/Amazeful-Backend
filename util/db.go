@@ -2,7 +2,6 @@ package util
 
 import (
 	"context"
-	"time"
 
 	"github.com/Amazeful/Amazeful-Backend/config"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,13 +15,15 @@ const (
 var client *mongo.Client
 
 //InitDB initializes mongo db instance
-func InitDB() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
+func InitDB(ctx context.Context) error {
 	var err error
 
 	client, err = mongo.Connect(ctx, options.Client().ApplyURI(config.GetConfig().MongoURI))
+	if err != nil {
+		return err
+	}
+
+	err = client.Ping(ctx, nil)
 	if err != nil {
 		return err
 	}
