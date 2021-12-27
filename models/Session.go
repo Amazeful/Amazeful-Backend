@@ -7,12 +7,13 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/xid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Session struct {
-	SessionId       string `json:"sessionId"`
-	User            string `json:"user"`
-	SelectedChannel string `json:"channel"`
+	SessionId       string             `json:"sessionId"`
+	User            primitive.ObjectID `json:"user"`
+	SelectedChannel primitive.ObjectID `json:"channel"`
 
 	rc *redis.Client
 }
