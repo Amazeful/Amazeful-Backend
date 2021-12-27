@@ -3,7 +3,7 @@ module github.com/Amazeful/Amazeful-Backend
 go 1.17
 
 require (
-	github.com/Amazeful/helix v1.25.1-0.20211225221333-41163ba71936
+	github.com/Amazeful/helix v1.25.1-0.20211227025021-0ab38f39a674
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/go-redis/redis/v8 v8.11.4
