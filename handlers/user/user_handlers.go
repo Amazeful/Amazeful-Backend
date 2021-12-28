@@ -1,7 +1,6 @@
 package user
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/Amazeful/Amazeful-Backend/consts"
@@ -10,36 +9,12 @@ import (
 )
 
 func HandleGetUser(rw http.ResponseWriter, req *http.Request) {
-	collection := util.GetCollection(consts.CollectionUser)
-
-	user := models.NewUser(collection)
-
-	err := user.FindByUserId(req.Context(), "123")
-	if err != nil {
-		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrRetrieveData)
+	user, ok := req.Context().Value(consts.CtxUser).(*models.User)
+	if !ok {
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrStrResourceDNE)
 		return
 	}
 
 	util.WriteResponse(rw, util.Response{Status: http.StatusOK, Data: user})
 
-}
-
-func HandleCreateUser(rw http.ResponseWriter, req *http.Request) {
-	collection := util.GetCollection(consts.CollectionUser)
-
-	user := models.NewUser(collection)
-
-	err := json.NewDecoder(req.Body).Decode(user)
-	if err != nil {
-		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrDecode)
-		return
-	}
-
-	err = user.Create(req.Context())
-	if err != nil {
-		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrInsert)
-		return
-	}
-
-	util.WriteResponse(rw, util.Response{Status: http.StatusCreated, Data: user})
 }

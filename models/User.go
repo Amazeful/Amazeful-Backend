@@ -36,6 +36,10 @@ func NewUser(collection *mongo.Collection) *User {
 	}
 }
 
+func (u *User) FindBylId(ctx context.Context, id primitive.ObjectID) error {
+	return u.FindOne(ctx, bson.M{"_id": id}, u)
+}
+
 func (u *User) FindByUserId(ctx context.Context, userId string) error {
 	return u.FindOne(ctx, bson.M{"userId": userId}, u)
 
