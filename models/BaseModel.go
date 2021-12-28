@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/Amazeful/Amazeful-Backend/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,7 +17,7 @@ type BaseModel struct {
 	UpdatedAt time.Time          `bson:"updatedAt" json:"updatedAt"`
 
 	isLoaded   bool
-	collection *mongo.Collection
+	collection util.ICollection
 }
 
 func (bm *BaseModel) created() {

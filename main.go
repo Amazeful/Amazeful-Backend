@@ -43,7 +43,7 @@ func main() {
 	client := util.GetDB()
 	defer client.Disconnect(ctx)
 
-	err = util.InitRedis(ctx)
+	err = util.InitRedisClient(ctx)
 	if err != nil {
 		zap.L().Fatal("failed to init redis", zap.Error(err))
 	}

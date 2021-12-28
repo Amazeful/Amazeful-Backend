@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/Amazeful/Amazeful-Backend/config"
+	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/Amazeful/helix"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
 )
 
@@ -34,7 +34,7 @@ type Channel struct {
 	Moderator       bool      `bson:"moderator" json:"moderator"`
 }
 
-func NewChannel(collection *mongo.Collection) *Channel {
+func NewChannel(collection util.ICollection) *Channel {
 	return &Channel{
 		BaseModel: BaseModel{
 			collection: collection,

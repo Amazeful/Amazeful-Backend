@@ -3,10 +3,10 @@ package models
 import (
 	"context"
 
+	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/Amazeful/helix"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type User struct {
@@ -28,7 +28,7 @@ type User struct {
 	Channel         primitive.ObjectID `bson:"channel" json:"channel"`
 }
 
-func NewUser(collection *mongo.Collection) *User {
+func NewUser(collection util.ICollection) *User {
 	return &User{
 		BaseModel: BaseModel{
 			collection: collection,

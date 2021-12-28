@@ -12,13 +12,31 @@ const (
 	dbName = "Amazeful"
 )
 
-var client *mongo.Client
+type IDB interface {
+	Collection(collection string) ICollection
+	Disconnect(ctx context.Context) error
+}
+type DB struct {
+	client *mongo.Client
+}
+
+//GetCollection returns mongodb collection
+func (db *DB) Collection(collection string) ICollection {
+	c := db.client.Database(dbName).Collection(collection)
+	return &Collection{Collection: c}
+}
+
+//Disconnect disconnects db client
+func (db *DB) Disconnect(ctx context.Context) error {
+	return db.client.Disconnect(ctx)
+}
+
+var db IDB
 
 //InitDB initializes mongo db instance
 func InitDB(ctx context.Context) error {
 	var err error
-
-	client, err = mongo.Connect(ctx, options.Client().ApplyURI(config.GetConfig().MongoURI))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.GetConfig().MongoURI))
 	if err != nil {
 		return err
 	}
@@ -28,15 +46,23 @@ func InitDB(ctx context.Context) error {
 		return err
 	}
 
+	db = &DB{
+		client: client,
+	}
+
 	return nil
 }
 
 //GetDB returns mongodb instance
-func GetDB() *mongo.Client {
-	return client
+func GetDB() IDB {
+	return db
 }
 
 //GetCollection returns mongodb collection
-func GetCollection(collection string) *mongo.Collection {
-	return client.Database(dbName).Collection(collection)
+func GetCollection(collection string) ICollection {
+	return db.Collection(collection)
+}
+
+func SetDB(newDB IDB) {
+	db = newDB
 }

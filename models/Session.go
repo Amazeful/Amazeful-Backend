@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/rs/xid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -15,10 +15,10 @@ type Session struct {
 	User            primitive.ObjectID `json:"user"`
 	SelectedChannel primitive.ObjectID `json:"channel"`
 
-	rc *redis.Client
+	rc util.IRedis
 }
 
-func NewSession(rc *redis.Client) *Session {
+func NewSession(rc util.IRedis) *Session {
 	return &Session{rc: rc}
 }
 
