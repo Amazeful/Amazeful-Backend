@@ -18,11 +18,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func TestChannelCtx(t *testing.T) {
+func TestUserCtx(t *testing.T) {
 
 	type args struct {
 		session *models.Session
-		channel *models.Channel
+		user    *models.User
 	}
 
 	tests := []struct {
@@ -32,8 +32,8 @@ func TestChannelCtx(t *testing.T) {
 		args           args
 	}{
 		{"no session", false, http.StatusUnauthorized, args{nil, nil}},
-		{"not in db", false, http.StatusInternalServerError, args{&models.Session{SelectedChannel: primitive.ObjectID{}, SessionId: "1"}, &models.Channel{ChannelId: "123"}}},
-		{"valid", true, http.StatusOK, args{&models.Session{SelectedChannel: primitive.ObjectID{}, SessionId: "1"}, &models.Channel{ChannelId: "123"}}},
+		{"not in db", false, http.StatusInternalServerError, args{&models.Session{SelectedChannel: primitive.ObjectID{}, SessionId: "1"}, &models.User{UserID: "123"}}},
+		{"valid", true, http.StatusOK, args{&models.Session{SelectedChannel: primitive.ObjectID{}, SessionId: "1"}, &models.User{UserID: "123"}}},
 	}
 
 	for _, test := range tests {
@@ -44,27 +44,28 @@ func TestChannelCtx(t *testing.T) {
 				req = req.WithContext(context.WithValue(req.Context(), consts.CtxSession, test.args.session))
 			}
 			handler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-				channel, ok := r.Context().Value(consts.CtxChannel).(*models.Channel)
+				user, ok := r.Context().Value(consts.CtxUser).(*models.User)
 				if !ok {
 					util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrStrResourceDNE)
 					return
 				}
+
 				util.WriteResponse(rw, util.Response{
 					Status: http.StatusOK,
-					Data:   channel,
+					Data:   user,
 				})
 			})
 			mockDB := new(mocks.IDB)
 			mockCollection := new(mocks.ICollection)
 			mockedResult := new(mocks.ISingleResult)
-			mockDB.On("Collection", consts.CollectionChannel).Return(mockCollection)
+			mockDB.On("Collection", consts.CollectionUser).Return(mockCollection)
 
 			if test.existsInDB {
-				mockedResult.On("Decode", models.NewChannel(mockCollection)).Return(nil).Run(func(args mock.Arguments) {
-					arg := args.Get(0).(*models.Channel)
-					arg.ChannelId = test.args.channel.ChannelId
+				mockedResult.On("Decode", models.NewUser(mockCollection)).Return(nil).Run(func(args mock.Arguments) {
+					arg := args.Get(0).(*models.User)
+					arg.UserID = test.args.user.UserID
 				})
-				mockCollection.On("FindOne", req.Context(), bson.M{"_id": test.args.session.SelectedChannel}, mock.Anything).Return(mockedResult)
+				mockCollection.On("FindOne", req.Context(), bson.M{"_id": test.args.session.User}, mock.Anything).Return(mockedResult)
 			} else {
 				mockedResult.On("Decode", mock.Anything).Return(mongo.ErrNoDocuments)
 				mockCollection.On("FindOne", req.Context(), mock.Anything, mock.Anything).Return(mockedResult)
@@ -72,18 +73,19 @@ func TestChannelCtx(t *testing.T) {
 
 			util.SetDB(mockDB)
 
-			testHandler := ChannelCtx(handler)
+			testHandler := UserCtx(handler)
 			testHandler.ServeHTTP(rw, req)
 			assert.Equal(t, test.expectedStatus, rw.Code)
 
 			if test.existsInDB {
 				result := rw.Result()
-				returnedChannel := &models.Channel{}
-				err := json.NewDecoder(result.Body).Decode(returnedChannel)
+				returnedUser := &models.User{}
+				err := json.NewDecoder(result.Body).Decode(returnedUser)
 				assert.NoError(t, err)
 
-				assert.Equal(t, returnedChannel.ChannelId, test.args.channel.ChannelId)
+				assert.Equal(t, returnedUser.UserID, test.args.user.UserID)
 			}
+
 		})
 	}
 }
