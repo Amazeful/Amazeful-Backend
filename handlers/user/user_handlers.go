@@ -16,5 +16,4 @@ func HandleGetUser(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	util.WriteResponse(rw, util.Response{Status: http.StatusOK, Data: user})
-
 }
