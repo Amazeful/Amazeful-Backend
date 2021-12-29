@@ -4,7 +4,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
 )
@@ -19,10 +18,10 @@ type JWT struct {
 	algorithm jwa.SignatureAlgorithm
 }
 
-func NewJWT() *JWT {
+func NewJWT(signKey []byte, algorithm jwa.SignatureAlgorithm) *JWT {
 	return &JWT{
-		signKey:   []byte(config.GetConfig().JwtSignKey),
-		algorithm: jwa.HS256,
+		signKey:   signKey,
+		algorithm: algorithm,
 	}
 }
 

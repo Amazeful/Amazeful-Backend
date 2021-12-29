@@ -8,12 +8,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/Amazeful/Amazeful-Backend/handlers/auth"
 	"github.com/Amazeful/Amazeful-Backend/models"
 	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/Amazeful/Amazeful-Backend/util/mocks"
 	"github.com/go-redis/redis/v8"
+	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -49,9 +49,7 @@ func TestAuthenticator(t *testing.T) {
 			})
 
 			if test.authenticated {
-				config := config.GetConfig()
-				config.JwtSignKey = "test"
-				jwt := models.NewJWT()
+				jwt := models.NewJWT([]byte("test"), jwa.HS256)
 				tokenString, err := jwt.Encode(test.args.sessionId, test.args.expiry)
 				assert.NoError(t, err)
 				req.AddCookie(&http.Cookie{Name: auth.JWTCookieName, Value: tokenString})

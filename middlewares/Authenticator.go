@@ -4,10 +4,12 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/Amazeful/Amazeful-Backend/consts"
 	"github.com/Amazeful/Amazeful-Backend/handlers/auth"
 	"github.com/Amazeful/Amazeful-Backend/models"
 	"github.com/Amazeful/Amazeful-Backend/util"
+	"github.com/lestrrat-go/jwx/jwa"
 )
 
 //Authenticator middleware authenticates requests
@@ -22,7 +24,7 @@ func Authenticator(next http.Handler) http.Handler {
 		}
 
 		//Parse and validate the token
-		jwt := models.NewJWT()
+		jwt := models.NewJWT([]byte(config.GetConfig().JwtSignKey), jwa.HS256)
 		t, err := jwt.Decode(cookie.Value)
 		if err != nil {
 			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)

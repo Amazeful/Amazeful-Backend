@@ -84,3 +84,9 @@ func (c *Channel) HydrateFromHelix(channel *helix.GetChannelInformationResponse)
 	c.GameName = channel.Data.GameName
 	c.Title = channel.Data.Title
 }
+
+func (c *Channel) UpdateCustomFields(newChannel *Channel) {
+	c.Joined = newChannel.Joined
+	c.Silenced = newChannel.Silenced
+	c.Prefix = newChannel.Prefix
+}

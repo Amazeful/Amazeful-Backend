@@ -10,6 +10,7 @@ import (
 	"github.com/Amazeful/Amazeful-Backend/models"
 	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/Amazeful/helix"
+	"github.com/lestrrat-go/jwx/jwa"
 )
 
 const JWTCookieName = "amazing_token"
@@ -123,7 +124,7 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 	session.SelectedChannel = channel.ID
 
 	//Make a new jwt for token
-	jwt := models.NewJWT()
+	jwt := models.NewJWT([]byte(config.GetConfig().JwtSignKey), jwa.HS256)
 	tokenString, err := jwt.Encode(session.SessionId, expiry)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
