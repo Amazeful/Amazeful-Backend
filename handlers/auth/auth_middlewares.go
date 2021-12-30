@@ -1,4 +1,4 @@
-package middlewares
+package auth
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/Amazeful/Amazeful-Backend/consts"
-	"github.com/Amazeful/Amazeful-Backend/handlers/auth"
 	"github.com/Amazeful/Amazeful-Backend/models"
 	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/lestrrat-go/jwx/jwa"
@@ -17,7 +16,7 @@ func Authenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		//Get the token from cookie
-		cookie, err := req.Cookie(auth.JWTCookieName)
+		cookie, err := req.Cookie(JWTCookieName)
 		if err != nil {
 			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return

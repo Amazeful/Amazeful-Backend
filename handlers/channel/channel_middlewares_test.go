@@ -1,4 +1,4 @@
-package middlewares
+package channel
 
 import (
 	"context"
@@ -18,7 +18,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func TestChannelCtx(t *testing.T) {
+func TestChannelFromSession(t *testing.T) {
 
 	type args struct {
 		session *models.Session
@@ -72,7 +72,7 @@ func TestChannelCtx(t *testing.T) {
 
 			util.SetDB(mockDB)
 
-			testHandler := ChannelCtx(handler)
+			testHandler := ChannelFromSession(handler)
 			testHandler.ServeHTTP(rw, req)
 			assert.Equal(t, test.expectedStatus, rw.Code)
 

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Amazeful/Amazeful-Backend/config"
+	"github.com/Amazeful/Amazeful-Backend/consts"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -13,7 +14,7 @@ const (
 )
 
 type IDB interface {
-	Collection(collection string) ICollection
+	Collection(collection consts.MongoCollection) ICollection
 	Disconnect(ctx context.Context) error
 }
 type DB struct {
@@ -21,8 +22,8 @@ type DB struct {
 }
 
 //GetCollection returns mongodb collection
-func (db *DB) Collection(collection string) ICollection {
-	c := db.client.Database(dbName).Collection(collection)
+func (db *DB) Collection(collection consts.MongoCollection) ICollection {
+	c := db.client.Database(dbName).Collection(string(collection))
 	return &Collection{Collection: c}
 }
 
@@ -59,7 +60,7 @@ func GetDB() IDB {
 }
 
 //GetCollection returns mongodb collection
-func GetCollection(collection string) ICollection {
+func GetCollection(collection consts.MongoCollection) ICollection {
 	return db.Collection(collection)
 }
 

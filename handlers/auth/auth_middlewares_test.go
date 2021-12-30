@@ -1,4 +1,4 @@
-package middlewares
+package auth
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Amazeful/Amazeful-Backend/handlers/auth"
 	"github.com/Amazeful/Amazeful-Backend/models"
 	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/Amazeful/Amazeful-Backend/util/mocks"
@@ -52,7 +51,7 @@ func TestAuthenticator(t *testing.T) {
 				jwt := models.NewJWT([]byte("test"), jwa.HS256)
 				tokenString, err := jwt.Encode(test.args.sessionId, test.args.expiry)
 				assert.NoError(t, err)
-				req.AddCookie(&http.Cookie{Name: auth.JWTCookieName, Value: tokenString})
+				req.AddCookie(&http.Cookie{Name: JWTCookieName, Value: tokenString})
 			}
 
 			mockedRedis := new(mocks.IRedis)

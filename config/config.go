@@ -25,8 +25,6 @@ type ServerConfig struct {
 var initialConfig = &ServerConfig{
 	IpAddress: "127.0.0.1",
 	Port:      "8000",
-	CertPath:  "",
-	KeyPath:   "",
 }
 
 var config *ServerConfig = initialConfig
@@ -48,6 +46,8 @@ func LoadConfig() error {
 	config.RedisURI = os.Getenv("REDIS_URI")
 	config.RedisPassword = os.Getenv("REDIS_PASSWORD")
 	config.JwtSignKey = os.Getenv("JWT_SIGN_KEY")
+	config.CertPath = os.Getenv("CERT_PATH")
+	config.KeyPath = os.Getenv("KEY_PATH")
 
 	validate := validator.New()
 

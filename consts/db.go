@@ -1,6 +1,8 @@
 package consts
 
+type MongoCollection string
+
 const (
-	CollectionChannel = "channel"
-	CollectionUser    = "user"
+	CollectionChannel MongoCollection = "channel"
+	CollectionUser    MongoCollection = "user"
 )

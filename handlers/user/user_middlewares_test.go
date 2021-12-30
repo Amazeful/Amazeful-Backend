@@ -1,4 +1,4 @@
-package middlewares
+package user
 
 import (
 	"context"
@@ -18,7 +18,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func TestUserCtx(t *testing.T) {
+func TestUserFromSession(t *testing.T) {
 
 	type args struct {
 		session *models.Session
@@ -73,7 +73,7 @@ func TestUserCtx(t *testing.T) {
 
 			util.SetDB(mockDB)
 
-			testHandler := UserCtx(handler)
+			testHandler := UserFromSession(handler)
 			testHandler.ServeHTTP(rw, req)
 			assert.Equal(t, test.expectedStatus, rw.Code)
 

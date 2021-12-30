@@ -46,6 +46,10 @@ func (c *Channel) FindBylId(ctx context.Context, id primitive.ObjectID) error {
 	return c.FindOne(ctx, bson.M{"_id": id}, c)
 }
 
+func (c *Channel) FindByChannelName(ctx context.Context, name string) error {
+	return c.FindOne(ctx, bson.M{"broadcasterName": name}, c)
+}
+
 func (c *Channel) FindByChannelId(ctx context.Context, channelId string) error {
 	return c.FindOne(ctx, bson.M{"channelId": channelId}, c)
 }

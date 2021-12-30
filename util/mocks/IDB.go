@@ -2,6 +2,7 @@
 
 package mocks
 
+import consts "github.com/Amazeful/Amazeful-Backend/consts"
 import context "context"
 import mock "github.com/stretchr/testify/mock"
 import util "github.com/Amazeful/Amazeful-Backend/util"
@@ -12,11 +13,11 @@ type IDB struct {
 }
 
 // Collection provides a mock function with given fields: collection
-func (_m *IDB) Collection(collection string) util.ICollection {
+func (_m *IDB) Collection(collection consts.MongoCollection) util.ICollection {
 	ret := _m.Called(collection)
 
 	var r0 util.ICollection
-	if rf, ok := ret.Get(0).(func(string) util.ICollection); ok {
+	if rf, ok := ret.Get(0).(func(consts.MongoCollection) util.ICollection); ok {
 		r0 = rf(collection)
 	} else {
 		if ret.Get(0) != nil {
