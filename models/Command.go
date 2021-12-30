@@ -6,7 +6,7 @@ import (
 )
 
 type Command struct {
-	BaseModel `bson",inline"`
+	BaseModel `bson:",inline"`
 
 	Name       string            `bson:"name" json:"name"`
 	Enabled    bool              `bson:"enabled" json:"enabled"`
