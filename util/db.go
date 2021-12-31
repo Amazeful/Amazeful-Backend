@@ -40,6 +40,10 @@ func defaultRepoGetter(dbName consts.MongoDatabase, collection consts.MongoColle
 	return NewMongoRepository(mongoClient, dbName, collection)
 }
 
-func SetRepoGetter(fuc func(dbName consts.MongoDatabase, collection consts.MongoCollection) Repository) {
-	NewRepository = fuc
+//SetMockRepoGetter replaces the default repo getter with a mock one
+//This is only used for testing
+func SetMockRepoGetter(r Repository) {
+	NewRepository = func(_ consts.MongoDatabase, _ consts.MongoCollection) Repository {
+		return r
+	}
 }

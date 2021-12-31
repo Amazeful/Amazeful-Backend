@@ -9,6 +9,7 @@ func ProcessRoutes(r chi.Router) {
 	r.Route("/{channelId}", func(r chi.Router) {
 		r.Use(ChannelFromId)
 		r.Get("/", HandleGetChannel)
+		r.Patch("/", HandleUpdateChannel)
 	})
 
 }

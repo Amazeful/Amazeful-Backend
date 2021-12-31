@@ -54,9 +54,7 @@ func TestChannelFromSession(t *testing.T) {
 				})
 			})
 			mockR := new(mocks.Repository)
-			util.SetRepoGetter(func(dbName consts.MongoDatabase, collection consts.MongoCollection) util.Repository {
-				return mockR
-			})
+			util.SetMockRepoGetter(mockR)
 			if test.existsInDB {
 				mockR.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewChannel(mockR)).Return(nil).Run(func(args mock.Arguments) {
 					arg := args.Get(2).(*models.Channel)

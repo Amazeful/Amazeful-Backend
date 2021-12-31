@@ -90,7 +90,7 @@ func HandleDeleteCommand(rw http.ResponseWriter, req *http.Request) {
 
 	err := command.Delete(req.Context())
 	if err != nil {
-		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
+		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrDB)
 		return
 	}
 

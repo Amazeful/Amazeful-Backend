@@ -34,6 +34,27 @@ func (_m *Repository) DeleteOne(ctx context.Context, filter primitive.M, opts ..
 	return r0
 }
 
+// FindAll provides a mock function with given fields: ctx, filter, results, opts
+func (_m *Repository) FindAll(ctx context.Context, filter primitive.M, results []util.Model, opts ...*options.FindOptions) error {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, filter, results)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, primitive.M, []util.Model, ...*options.FindOptions) error); ok {
+		r0 = rf(ctx, filter, results, opts...)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // FindOne provides a mock function with given fields: ctx, filter, document, opts
 func (_m *Repository) FindOne(ctx context.Context, filter primitive.M, document util.Model, opts ...*options.FindOneOptions) error {
 	_va := make([]interface{}, len(opts))

@@ -14,6 +14,7 @@ type Repository interface {
 	InsertOne(ctx context.Context, document Model, opts ...*options.InsertOneOptions) error
 	FindOne(ctx context.Context, filter bson.M, document Model, opts ...*options.FindOneOptions) error
 	ReplaceOne(ctx context.Context, filter bson.M, replacement Model, opts ...*options.ReplaceOptions) error
+	FindAll(ctx context.Context, filter bson.M, results []Model, opts ...*options.FindOptions) error
 	DeleteOne(ctx context.Context, filter bson.M, opts ...*options.DeleteOptions) error
 }
 
@@ -39,6 +40,18 @@ func (r *MongoRepository) FindOne(ctx context.Context, filter bson.M, document M
 		return err
 	}
 	document.SetLoaded(true)
+	return nil
+}
+
+func (r *MongoRepository) FindAll(ctx context.Context, filter bson.M, results []Model, opts ...*options.FindOptions) error {
+	cursor, err := r.client.Database(string(r.Database)).Collection(string(r.Collection)).Find(ctx, filter, opts...)
+	if err != nil {
+		return err
+	}
+	err = cursor.All(ctx, results)
+	for _, result := range results {
+		result.SetLoaded(true)
+	}
 	return nil
 }
 
