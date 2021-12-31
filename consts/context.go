@@ -6,4 +6,5 @@ const (
 	CtxSession ContextKey = "session"
 	CtxChannel ContextKey = "channel"
 	CtxUser    ContextKey = "user"
+	CtxCommand ContextKey = "command"
 )

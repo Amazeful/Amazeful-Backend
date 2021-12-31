@@ -11,10 +11,10 @@ import (
 )
 
 type Repository interface {
-	New(db consts.MongoDatabase, collection consts.MongoCollection) Repository
 	InsertOne(ctx context.Context, document Model, opts ...*options.InsertOneOptions) error
 	FindOne(ctx context.Context, filter bson.M, document Model, opts ...*options.FindOneOptions) error
 	ReplaceOne(ctx context.Context, filter bson.M, replacement Model, opts ...*options.ReplaceOptions) error
+	DeleteOne(ctx context.Context, filter bson.M, opts ...*options.DeleteOptions) error
 }
 
 type MongoRepository struct {
@@ -23,17 +23,11 @@ type MongoRepository struct {
 	client     *mongo.Client
 }
 
-func NewWithClient(client *mongo.Client) *MongoRepository {
-	return &MongoRepository{
-		client: client,
-	}
-}
-
-func (r *MongoRepository) New(db consts.MongoDatabase, collection consts.MongoCollection) Repository {
+func NewMongoRepository(client *mongo.Client, db consts.MongoDatabase, collection consts.MongoCollection) *MongoRepository {
 	return &MongoRepository{
 		Database:   db,
 		Collection: collection,
-		client:     r.client,
+		client:     client,
 	}
 }
 
@@ -67,5 +61,16 @@ func (r *MongoRepository) InsertOne(ctx context.Context, document Model, opts ..
 
 	document.SetId(insertResult.InsertedID)
 	document.SetLoaded(true)
+	return nil
+}
+
+func (r *MongoRepository) DeleteOne(ctx context.Context, filter bson.M, opts ...*options.DeleteOptions) error {
+	result, err := r.client.Database(string(r.Database)).Collection(string(r.Collection)).DeleteOne(ctx, filter, opts...)
+	if err != nil {
+		return err
+	}
+	if result.DeletedCount == 0 {
+		return errors.New("zero matches returned")
+	}
 	return nil
 }

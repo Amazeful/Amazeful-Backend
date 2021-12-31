@@ -38,3 +38,64 @@ func HandleCreateCommand(rw http.ResponseWriter, req *http.Request) {
 		Data:   command,
 	})
 }
+
+func HandleGetCommand(rw http.ResponseWriter, req *http.Request) {
+	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
+	if !ok {
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		return
+	}
+
+	util.WriteResponse(rw, util.Response{
+		Status: http.StatusOK,
+		Data:   command,
+	})
+}
+
+func HandleUpdateCommand(rw http.ResponseWriter, req *http.Request) {
+	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
+	if !ok {
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		return
+	}
+
+	r := util.NewRepository(consts.DBAmazeful, consts.CollectionCommand)
+	updatedCommand := models.NewCommand(r)
+
+	err := json.NewDecoder(req.Body).Decode(updatedCommand)
+	if err != nil {
+		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDecode)
+		return
+	}
+
+	command.UpdateCustomFields(updatedCommand)
+	err = command.Create(req.Context())
+	if err != nil {
+		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
+		return
+	}
+
+	util.WriteResponse(rw, util.Response{
+		Status: http.StatusOK,
+		Data:   command,
+	})
+}
+
+func HandleDeleteCommand(rw http.ResponseWriter, req *http.Request) {
+	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
+	if !ok {
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		return
+	}
+
+	err := command.Delete(req.Context())
+	if err != nil {
+		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
+		return
+	}
+
+	util.WriteResponse(rw, util.Response{
+		Status: http.StatusOK,
+		Data:   command,
+	})
+}

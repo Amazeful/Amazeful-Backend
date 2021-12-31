@@ -55,7 +55,9 @@ func TestUserFromSession(t *testing.T) {
 				})
 			})
 			mockR := new(mocks.Repository)
-			util.SetRepository(mockR)
+			util.SetRepoGetter(func(dbName consts.MongoDatabase, collection consts.MongoCollection) util.Repository {
+				return mockR
+			})
 
 			if test.existsInDB {
 				mockR.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewUser(mockR)).Return(nil).Run(func(args mock.Arguments) {

@@ -10,7 +10,9 @@ import (
 )
 
 var mongoClient *mongo.Client
-var repository Repository
+var NewRepository GetRepo = defaultRepoGetter
+
+type GetRepo func(dbName consts.MongoDatabase, collection consts.MongoCollection) Repository
 
 //InitDB initializes mongo db instance
 func InitDB(ctx context.Context) error {
@@ -25,7 +27,6 @@ func InitDB(ctx context.Context) error {
 	}
 
 	mongoClient = client
-	repository = NewWithClient(mongoClient)
 
 	return nil
 }
@@ -35,11 +36,10 @@ func GetMongoClient() *mongo.Client {
 	return mongoClient
 }
 
-func NewRepository(dbName consts.MongoDatabase, collection consts.MongoCollection) Repository {
-	return repository.New(dbName, collection)
+func defaultRepoGetter(dbName consts.MongoDatabase, collection consts.MongoCollection) Repository {
+	return NewMongoRepository(mongoClient, dbName, collection)
 }
 
-//SetRepository can be used to set a fake repository for testing
-func SetRepository(r Repository) {
-	repository = r
+func SetRepoGetter(fuc func(dbName consts.MongoDatabase, collection consts.MongoCollection) Repository) {
+	NewRepository = fuc
 }
