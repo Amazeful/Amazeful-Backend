@@ -1,4 +1,4 @@
-package channel
+package middlewares
 
 import (
 	"context"

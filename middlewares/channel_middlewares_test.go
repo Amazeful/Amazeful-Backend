@@ -1,4 +1,4 @@
-package channel
+package middlewares
 
 import (
 	"context"
@@ -10,7 +10,6 @@ import (
 	"github.com/Amazeful/Amazeful-Backend/consts"
 	"github.com/Amazeful/Amazeful-Backend/models"
 	"github.com/Amazeful/Amazeful-Backend/util"
-	"github.com/Amazeful/Amazeful-Backend/util/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,7 +17,7 @@ import (
 )
 
 func TestChannelFromSession(t *testing.T) {
-
+	t.Parallel()
 	type args struct {
 		session *models.Session
 		channel *models.Channel
@@ -53,16 +52,14 @@ func TestChannelFromSession(t *testing.T) {
 					Data:   channel,
 				})
 			})
-			mockR := new(mocks.Repository)
-			util.SetMockRepoGetter(mockR)
 			if test.existsInDB {
-				mockR.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewChannel(mockR)).Return(nil).Run(func(args mock.Arguments) {
+				mockRepo.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewChannel(mockRepo)).Return(nil).Run(func(args mock.Arguments) {
 					arg := args.Get(2).(*models.Channel)
 					arg.ChannelId = test.args.channel.ChannelId
 					arg.SetLoaded(true)
-				})
+				}).Once()
 			} else {
-				mockR.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewChannel(mockR)).Return(nil)
+				mockRepo.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewChannel(mockRepo)).Return(nil).Once()
 
 			}
 

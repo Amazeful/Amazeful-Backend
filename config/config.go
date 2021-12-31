@@ -70,3 +70,9 @@ func LoadConfig() error {
 func GetConfig() *ServerConfig {
 	return config
 }
+
+//SetConfig sets server config.
+//Should only be used in test files.
+func SetConfig(c *ServerConfig) {
+
+}

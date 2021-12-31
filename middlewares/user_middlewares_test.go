@@ -1,4 +1,4 @@
-package user
+package middlewares
 
 import (
 	"context"
@@ -10,7 +10,6 @@ import (
 	"github.com/Amazeful/Amazeful-Backend/consts"
 	"github.com/Amazeful/Amazeful-Backend/models"
 	"github.com/Amazeful/Amazeful-Backend/util"
-	"github.com/Amazeful/Amazeful-Backend/util/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,7 +17,7 @@ import (
 )
 
 func TestUserFromSession(t *testing.T) {
-
+	t.Parallel()
 	type args struct {
 		session *models.Session
 		user    *models.User
@@ -54,17 +53,15 @@ func TestUserFromSession(t *testing.T) {
 					Data:   user,
 				})
 			})
-			mockR := new(mocks.Repository)
-			util.SetMockRepoGetter(mockR)
 
 			if test.existsInDB {
-				mockR.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewUser(mockR)).Return(nil).Run(func(args mock.Arguments) {
+				mockRepo.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewUser(mockRepo)).Return(nil).Run(func(args mock.Arguments) {
 					arg := args.Get(2).(*models.User)
 					arg.UserID = test.args.user.UserID
 					arg.SetLoaded(true)
-				})
+				}).Once()
 			} else {
-				mockR.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewUser(mockR)).Return(nil)
+				mockRepo.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewUser(mockRepo)).Return(nil).Once()
 			}
 
 			testHandler := UserFromSession(handler)
