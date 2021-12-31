@@ -1,6 +1,8 @@
 package models
 
 import (
+	"context"
+
 	"github.com/Amazeful/Amazeful-Backend/models/embeddables"
 	"github.com/Amazeful/Amazeful-Backend/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,12 +17,11 @@ type Command struct {
 	Role       embeddables.UserRole          `bson:"role" json:"role"`
 	Stream     embeddables.StreamStatus      `bson:"stream" json:"stream"`
 	Response   string                        `bson:"response" json:"response"`
-	Aliases    []string                      `bson:"aliases" json:"aliases"`
+	Aliases    []string                      `bson:"aliases,omitempty" json:"aliases"`
 	HasVar     bool                          `bson:"hasVar" json:"-"`
 	Attributes embeddables.CommandAttributes `bson:"attributes,omitempty" json:"attributes"`
 	Timer      embeddables.Timer             `bson:"timer,omitempty" json:"timer"`
-
-	Channel primitive.ObjectID `bson:"channel" json:"-"`
+	Channel    primitive.ObjectID            `bson:"channel" json:"channel"`
 }
 
 func NewCommand(r util.Repository) *Command {
@@ -33,4 +34,8 @@ func NewCommand(r util.Repository) *Command {
 		Role:      embeddables.UserRoleGlobal,
 		Stream:    embeddables.StreamLive | embeddables.StreamOffline,
 	}
+}
+
+func (c *Command) Create(ctx context.Context) error {
+	return c.R.InsertOne(ctx, c)
 }

@@ -7,4 +7,5 @@ const (
 	DBAmazeful        MongoDatabase   = "Amazeful"
 	CollectionChannel MongoCollection = "channel"
 	CollectionUser    MongoCollection = "user"
+	CollectionCommand MongoCollection = "command"
 )

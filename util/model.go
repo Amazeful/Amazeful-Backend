@@ -14,7 +14,7 @@ type Model interface {
 }
 
 type BaseModel struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty" json:"-"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`
 	UpdatedAt time.Time          `bson:"updatedAt" json:"updatedAt"`
 
