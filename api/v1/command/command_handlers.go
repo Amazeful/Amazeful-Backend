@@ -12,7 +12,7 @@ import (
 func HandleCreateCommand(rw http.ResponseWriter, req *http.Request) {
 	channel, ok := req.Context().Value(consts.CtxChannel).(*models.Channel)
 	if !ok {
-		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrStrResourceDNE)
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
 		return
 	}
 
