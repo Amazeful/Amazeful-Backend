@@ -1,4 +1,4 @@
-package models
+package embeddables
 
 type UserRole int
 

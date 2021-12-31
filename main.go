@@ -36,7 +36,7 @@ func main() {
 	if err != nil {
 		zap.L().Fatal("failed to init db", zap.Error(err))
 	}
-	client := util.GetDB()
+	client := util.GetMongoClient()
 	defer client.Disconnect(ctx)
 
 	//setup redis

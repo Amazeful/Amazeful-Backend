@@ -4,16 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/Amazeful/Amazeful-Backend/util"
 	"github.com/Amazeful/helix"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.uber.org/zap"
 )
 
 type Channel struct {
-	BaseModel `bson:",inline"`
+	util.BaseModel `bson:",inline"`
 
 	ChannelId       string    `bson:"channelId" json:"channelId"`
 	BroadcasterName string    `bson:"broadcasterName" json:"broadcasterName"`
@@ -34,50 +32,32 @@ type Channel struct {
 	Moderator       bool      `bson:"moderator" json:"moderator"`
 }
 
-func NewChannel(collection util.ICollection) *Channel {
+func NewChannel(r util.Repository) *Channel {
 	return &Channel{
-		BaseModel: BaseModel{
-			collection: collection,
+		BaseModel: util.BaseModel{
+			R: r,
 		},
 	}
 }
 
 func (c *Channel) FindBylId(ctx context.Context, id primitive.ObjectID) error {
-	return c.FindOne(ctx, bson.M{"_id": id}, c)
+	return c.R.FindOne(ctx, bson.M{"_id": id}, c)
 }
 
 func (c *Channel) FindByChannelName(ctx context.Context, name string) error {
-	return c.FindOne(ctx, bson.M{"broadcasterName": name}, c)
+	return c.R.FindOne(ctx, bson.M{"broadcasterName": name}, c)
 }
 
 func (c *Channel) FindByChannelId(ctx context.Context, channelId string) error {
-	return c.FindOne(ctx, bson.M{"channelId": channelId}, c)
+	return c.R.FindOne(ctx, bson.M{"channelId": channelId}, c)
 }
 
 func (c *Channel) Create(ctx context.Context) error {
-	return c.Insert(ctx, c)
+	return c.R.InsertOne(ctx, c)
 }
 
 func (c *Channel) Update(ctx context.Context) error {
-	return c.ReplaceOne(ctx, c)
-}
-
-//GetUserFromTwitch gets user info from twitch helix API.
-//If a the user exists in db, it updates the user; otherwise, it creates a new user.
-func (c *Channel) GetChannelByAccessToken(ctx context.Context, accessToken string) error {
-	client, err := helix.NewClient(&helix.Options{
-		ClientID:        config.GetTwitchConfig().ClientID,
-		UserAccessToken: accessToken,
-	})
-	if err != nil {
-		return err
-	}
-	user, err := client.GetChannelInformation(nil)
-	if err != nil {
-		return err
-	}
-	zap.L().Info("test", zap.Any("user", user))
-	return nil
+	return c.R.ReplaceOne(ctx, bson.M{"_id": c.ID}, c)
 }
 
 func (c *Channel) HydrateFromHelix(channel *helix.GetChannelInformationResponse) {

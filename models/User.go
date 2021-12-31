@@ -10,7 +10,7 @@ import (
 )
 
 type User struct {
-	BaseModel `bson:",inline"`
+	util.BaseModel `bson:",inline"`
 
 	UserID          string             `bson:"userId" json:"userId"`
 	Login           string             `bson:"login" json:"login"`
@@ -28,29 +28,29 @@ type User struct {
 	Channel         primitive.ObjectID `bson:"channel" json:"channel"`
 }
 
-func NewUser(collection util.ICollection) *User {
+func NewUser(r util.Repository) *User {
 	return &User{
-		BaseModel: BaseModel{
-			collection: collection,
+		BaseModel: util.BaseModel{
+			R: r,
 		},
 	}
 }
 
 func (u *User) FindBylId(ctx context.Context, id primitive.ObjectID) error {
-	return u.FindOne(ctx, bson.M{"_id": id}, u)
+	return u.R.FindOne(ctx, bson.M{"_id": id}, u)
 }
 
 func (u *User) FindByUserId(ctx context.Context, userId string) error {
-	return u.FindOne(ctx, bson.M{"userId": userId}, u)
+	return u.R.FindOne(ctx, bson.M{"userId": userId}, u)
 
 }
 
 func (u *User) Create(ctx context.Context) error {
-	return u.Insert(ctx, u)
+	return u.R.InsertOne(ctx, u)
 }
 
 func (u *User) Update(ctx context.Context) error {
-	return u.ReplaceOne(ctx, u)
+	return u.R.ReplaceOne(ctx, bson.M{"_id": u.ID}, u)
 }
 
 func (u *User) HydrateFromHelix(user *helix.UserResponse) {

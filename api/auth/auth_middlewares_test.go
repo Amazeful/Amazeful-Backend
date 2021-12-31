@@ -54,7 +54,7 @@ func TestAuthenticator(t *testing.T) {
 				req.AddCookie(&http.Cookie{Name: JWTCookieName, Value: tokenString})
 			}
 
-			mockedRedis := new(mocks.IRedis)
+			mockedRedis := new(mocks.Redis)
 			util.SetRedis(mockedRedis)
 			session := models.NewSession(mockedRedis)
 			result := &redis.StringCmd{}

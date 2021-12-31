@@ -8,24 +8,24 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type IRedis interface {
+var rc Redis
+
+type Redis interface {
 	Get(ctx context.Context, key string) *redis.StringCmd
 	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd
 }
 
-type Redis struct {
+type RedisClient struct {
 	client *redis.Client
 }
 
-func (r *Redis) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
+func (r *RedisClient) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
 	return r.client.Set(ctx, key, value, expiration)
 }
 
-func (r *Redis) Get(ctx context.Context, key string) *redis.StringCmd {
+func (r *RedisClient) Get(ctx context.Context, key string) *redis.StringCmd {
 	return r.client.Get(ctx, key)
 }
-
-var rc IRedis
 
 //InitRedis initializes Redis client
 func InitRedisClient(ctx context.Context) error {
@@ -39,17 +39,17 @@ func InitRedisClient(ctx context.Context) error {
 		return rx.Err()
 	}
 
-	rc = &Redis{
+	rc = &RedisClient{
 		client: redis,
 	}
 	return nil
 }
 
 //GetRedis returns redis client
-func GetRedis() IRedis {
+func GetRedis() Redis {
 	return rc
 }
 
-func SetRedis(redis IRedis) {
+func SetRedis(redis Redis) {
 	rc = redis
 }

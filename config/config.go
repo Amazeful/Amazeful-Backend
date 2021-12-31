@@ -16,6 +16,7 @@ type ServerConfig struct {
 	TLS           bool
 	CertPath      string `validate:"required_with=TLS"`
 	KeyPath       string `validate:"required_with=TLS"`
+	Database      string `validate:"required"`
 	MongoURI      string `validate:"required,uri"`
 	RedisURI      string `validate:"required,uri"`
 	RedisPassword string `validate:"required"`
@@ -25,6 +26,7 @@ type ServerConfig struct {
 var initialConfig = &ServerConfig{
 	IpAddress: "127.0.0.1",
 	Port:      "8000",
+	Database:  "Amazeful",
 }
 
 var config *ServerConfig = initialConfig

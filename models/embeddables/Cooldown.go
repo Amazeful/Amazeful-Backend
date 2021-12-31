@@ -1,4 +1,4 @@
-package models
+package embeddables
 
 type Cooldown struct {
 	Global int `bson:"global" json:"global"`

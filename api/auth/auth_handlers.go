@@ -66,10 +66,10 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	userCollection := util.GetCollection(consts.CollectionUser)
-	channelCollection := util.GetCollection(consts.CollectionChannel)
+	ru := util.NewRepository(consts.DBAmazeful, consts.CollectionUser)
+	rc := util.NewRepository(consts.DBAmazeful, consts.CollectionChannel)
 
-	channel := models.NewChannel(channelCollection)
+	channel := models.NewChannel(rc)
 	err = channel.FindByChannelId(req.Context(), twitchChannel.Data.BroadcasterID)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
@@ -87,7 +87,7 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	//make a new user using tokens
-	user := models.NewUser(userCollection)
+	user := models.NewUser(ru)
 	err = user.FindByUserId(req.Context(), twitchUser.Data.ID)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))

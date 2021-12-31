@@ -15,10 +15,10 @@ type Session struct {
 	User            primitive.ObjectID `json:"user"`
 	SelectedChannel primitive.ObjectID `json:"channel"`
 
-	rc util.IRedis
+	rc util.Redis
 }
 
-func NewSession(rc util.IRedis) *Session {
+func NewSession(rc util.Redis) *Session {
 	return &Session{rc: rc}
 }
 

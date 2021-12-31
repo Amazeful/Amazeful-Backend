@@ -18,8 +18,8 @@ func UserFromSession(next http.Handler) http.Handler {
 			return
 		}
 
-		collection := util.GetCollection(consts.CollectionUser)
-		user := models.NewUser(collection)
+		r := util.NewRepository(consts.DBAmazeful, consts.CollectionUser)
+		user := models.NewUser(r)
 		err := user.FindBylId(req.Context(), session.User)
 		if err != nil {
 			util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))

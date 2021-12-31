@@ -1,13 +1,11 @@
 package server
 
 import (
-	"github.com/Amazeful/Amazeful-Backend/handlers/auth"
-	"github.com/Amazeful/Amazeful-Backend/handlers/channel"
-	"github.com/Amazeful/Amazeful-Backend/handlers/user"
+	"github.com/Amazeful/Amazeful-Backend/api/auth"
+	v1 "github.com/Amazeful/Amazeful-Backend/api/v1"
 )
 
 func (s *server) addRoutes() {
 	s.r.Route("/auth", auth.ProcessRoutes)
-	s.r.Route("/channel", channel.ProcessRoutes)
-	s.r.Route("/user", user.ProcessRoutes)
+	s.r.Route("/v1", v1.ProcessRoutes)
 }

@@ -19,8 +19,8 @@ func ChannelFromSession(next http.Handler) http.Handler {
 			return
 		}
 
-		collection := util.GetCollection(consts.CollectionChannel)
-		channel := models.NewChannel(collection)
+		r := util.NewRepository(consts.DBAmazeful, consts.CollectionChannel)
+		channel := models.NewChannel(r)
 		err := channel.FindBylId(req.Context(), session.SelectedChannel)
 		if err != nil {
 			util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
@@ -44,8 +44,8 @@ func ChannelFromParam(next http.Handler) http.Handler {
 			return
 		}
 
-		collection := util.GetCollection(consts.CollectionChannel)
-		channel := models.NewChannel(collection)
+		r := util.NewRepository(consts.DBAmazeful, consts.CollectionChannel)
+		channel := models.NewChannel(r)
 		err := channel.FindByChannelName(req.Context(), channelName)
 		if err != nil {
 			util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
