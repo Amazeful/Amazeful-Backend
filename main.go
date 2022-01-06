@@ -74,10 +74,9 @@ func main() {
 	r.Use(httprate.Limit(requestLimit, limitTimeout, httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint)))
 
 	authHandler := auth.NewAuthHandler(resources)
-	v1 := v1.NewV1(resources)
 
 	r.Route("/auth", authHandler.ProcessRoutes)
-	r.Route("/v1", v1.ProcessRoutes)
+	r.Route("/v1", v1.SetupRoutes(resources))
 
 	if config.ServerConfig.TLS {
 		err = http.ListenAndServeTLS(config.ServerConfig.IpAddress+":"+config.ServerConfig.Port, config.ServerConfig.CertPath, config.ServerConfig.KeyPath, r)

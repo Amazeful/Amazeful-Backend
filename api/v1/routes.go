@@ -7,18 +7,9 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type V1 struct {
-	*util.Resources
-}
-
-func NewV1(resources *util.Resources) *V1 {
-	return &V1{
-		Resources: resources,
+func SetupRoutes(resources *util.Resources) func(r chi.Router) {
+	return func(r chi.Router) {
+		channelHandlers := channel.NewChannelHandler(resources)
+		r.Route("/channel", channelHandlers.ProcessRoutes)
 	}
-}
-func (v *V1) ProcessRoutes(r chi.Router) {
-	channelHandlers := channel.NewChannelHandler(v.Resources)
-
-	r.Route("/channel", channelHandlers.ProcessRoutes)
-
 }
