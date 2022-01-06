@@ -1,19 +1,20 @@
 package middlewares
 
-import (
-	"os"
-	"testing"
+// func TestMain(m *testing.M) {
 
-	"github.com/Amazeful/Amazeful-Backend/util"
-	"github.com/Amazeful/Amazeful-Backend/util/mocks"
-)
+// 	err := config.LoadConfig()
+// 	if err != nil {
+// 		log.Fatalf("failed to load config: %v", err)
+// 	}
 
-var mockRepo *mocks.Repository
+// 	err = util.InitDB(context.Background())
+// 	if err != nil {
+// 		log.Fatalf("failed to init db: %v", err)
+// 	}
 
-func TestMain(m *testing.M) {
-
-	mockRepo = new(mocks.Repository)
-	util.SetMockRepoGetter(mockRepo)
-
-	os.Exit(m.Run())
-}
+// 	err = util.InitCache(context.Background())
+// 	if err != nil {
+// 		log.Fatalf("failed to init redis: %v", err)
+// 	}
+// 	os.Exit(m.Run())
+// }

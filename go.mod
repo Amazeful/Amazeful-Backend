@@ -3,14 +3,14 @@ module github.com/Amazeful/Amazeful-Backend
 go 1.17
 
 require (
+	github.com/Amazeful/dataful v0.0.0-20220106014841-2d067210b6b2
 	github.com/Amazeful/helix v1.25.1-0.20211227025021-0ab38f39a674
+	github.com/caarlos0/env/v6 v6.9.1
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/httprate v0.5.2
 	github.com/go-playground/validator/v10 v10.9.0
-	github.com/go-redis/redis/v8 v8.11.4
 	github.com/joho/godotenv v1.4.0
 	github.com/lestrrat-go/jwx v1.2.14
-	github.com/rs/xid v1.3.0
 	github.com/stretchr/testify v1.7.0
 	go.mongodb.org/mongo-driver v1.8.1
 	go.uber.org/zap v1.19.1
@@ -25,6 +25,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-redis/redis/v8 v8.11.4 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/goccy/go-json v0.8.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.0.0 // indirect
@@ -39,7 +40,8 @@ require (
 	github.com/lestrrat-go/option v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.3.0 // indirect
+	github.com/rs/xid v1.3.0 // indirect
+	github.com/stretchr/objx v0.1.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect

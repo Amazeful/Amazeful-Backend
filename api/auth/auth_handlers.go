@@ -5,48 +5,41 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Amazeful/Amazeful-Backend/config"
-	"github.com/Amazeful/Amazeful-Backend/consts"
-	"github.com/Amazeful/Amazeful-Backend/models"
 	"github.com/Amazeful/Amazeful-Backend/util"
+
+	"github.com/Amazeful/dataful"
+	"github.com/Amazeful/dataful/models"
 	"github.com/Amazeful/helix"
 	"github.com/lestrrat-go/jwx/jwa"
 )
 
 const JWTCookieName = "amazing_token"
 
-func HandleTwitchLogin(rw http.ResponseWriter, req *http.Request) {
-	twitchOauthConfig := config.GetTwitchOauthConfig()
-	twitchConfig := config.GetTwitchConfig()
-	http.Redirect(rw, req, twitchOauthConfig.AuthCodeURL(twitchConfig.State), http.StatusTemporaryRedirect)
+func (ah *AuthHandler) HandleTwitchLogin(rw http.ResponseWriter, req *http.Request) {
+	oauthConfig := ah.Config.GetOauthConfig()
+	http.Redirect(rw, req, oauthConfig.AuthCodeURL(ah.Config.TwitchConfig.State), http.StatusTemporaryRedirect)
 }
 
-func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
-	twitchConfig := config.GetTwitchConfig()
-	twitchOauthConfig := config.GetTwitchOauthConfig()
-
-	//Get state and token value
-	receivedState := req.URL.Query().Get("state")
+func (ah *AuthHandler) HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
+	state := req.URL.Query().Get("state")
 	code := req.URL.Query().Get("code")
 
 	//Check state value
-	if twitchConfig.State != receivedState {
-		err := fmt.Errorf("invalid state value received %s", receivedState)
+	if ah.Config.TwitchConfig.State != state {
+		err := fmt.Errorf("invalid state value received -- %s", state)
 		util.WriteError(rw, err, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
 		return
 	}
 
 	//Use the code to get tokens from twitch
-	token, err := twitchOauthConfig.Exchange(req.Context(), code)
+	token, err := ah.Config.GetOauthConfig().Exchange(req.Context(), code)
 	if err != nil {
-		util.WriteError(rw, err, http.StatusUnauthorized, "Failed to get tokens from Twitch.")
+		util.WriteError(rw, err, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
 		return
 	}
 
-	client, err := helix.NewClient(&helix.Options{
-		ClientID:        config.GetTwitchConfig().ClientID,
-		UserAccessToken: token.AccessToken,
-	})
+	//Create api client
+	client, err := ah.TwitchAPI.NewAPI(&helix.Options{UserAccessToken: token.AccessToken})
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 		return
@@ -66,8 +59,8 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	ru := util.NewRepository(consts.DBAmazeful, consts.CollectionUser)
-	rc := util.NewRepository(consts.DBAmazeful, consts.CollectionChannel)
+	ru := ah.DB.Repository(dataful.DBAmazeful, dataful.CollectionUser)
+	rc := ah.DB.Repository(dataful.DBAmazeful, dataful.CollectionChannel)
 
 	channel := models.NewChannel(rc)
 	err = channel.FindByChannelId(req.Context(), twitchChannel.Data.BroadcasterID)
@@ -75,7 +68,13 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 		return
 	}
-	channel.HydrateFromHelix(twitchChannel)
+	channel.ChannelId = twitchChannel.Data.BroadcasterID
+	channel.BroadcasterName = twitchChannel.Data.BroadcasterName
+	channel.Language = twitchChannel.Data.BroadcasterLanguage
+	channel.GameId = twitchChannel.Data.GameID
+	channel.GameName = twitchChannel.Data.GameName
+	channel.Title = twitchChannel.Data.Title
+
 	if channel.Loaded() {
 		err = channel.Update(req.Context())
 	} else {
@@ -93,7 +92,15 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 		return
 	}
-	user.HydrateFromHelix(twitchUser)
+	user.UserID = twitchUser.Data.ID
+	user.Login = twitchUser.Data.Login
+	user.DisplayName = twitchUser.Data.DisplayName
+	user.Type = twitchUser.Data.Type
+	user.BroadcasterType = twitchUser.Data.BroadcasterType
+	user.Description = twitchUser.Data.Description
+	user.ProfileImageURL = twitchUser.Data.ProfileImageURL
+	user.OfflineImageURL = twitchUser.Data.OfflineImageURL
+	user.ViewCount = twitchUser.Data.ViewCount
 	user.AccessToken = token.AccessToken
 	user.RefreshToken = token.RefreshToken
 	user.Channel = channel.ID
@@ -118,13 +125,13 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 	expiry := time.Now().Add(time.Hour * 24)
 
 	//Make a new session for user
-	session := models.NewSession(util.GetRedis())
+	session := models.NewSession(ah.Cache)
 	session.GenerateSessionId()
 	session.User = user.ID
 	session.SelectedChannel = channel.ID
 
 	//Make a new jwt for token
-	jwt := models.NewJWT([]byte(config.GetConfig().JwtSignKey), jwa.HS256)
+	jwt := models.NewJWT([]byte(ah.Config.ServerConfig.JwtSignKey), jwa.HS256)
 	tokenString, err := jwt.Encode(session.SessionId, expiry)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))

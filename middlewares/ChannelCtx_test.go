@@ -1,80 +1,63 @@
 package middlewares
 
-import (
-	"context"
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"testing"
+// func TestChannelFromSession(t *testing.T) {
+// 	t.Parallel()
+// 	type args struct {
+// 		session *models.Session
+// 		channel *models.Channel
+// 	}
 
-	"github.com/Amazeful/Amazeful-Backend/consts"
-	"github.com/Amazeful/Amazeful-Backend/models"
-	"github.com/Amazeful/Amazeful-Backend/util"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
+// 	tests := []struct {
+// 		name           string
+// 		existsInDB     bool
+// 		expectedStatus int
+// 		args           args
+// 	}{
+// 		{"no session", false, http.StatusUnauthorized, args{nil, nil}},
+// 		{"not in db", false, http.StatusInternalServerError, args{&models.Session{SelectedChannel: primitive.ObjectID{}, SessionId: "1"}, &models.Channel{ChannelId: "TestChannelFromSession1"}}},
+// 		{"valid", true, http.StatusOK, args{&models.Session{SelectedChannel: primitive.ObjectID{}, SessionId: "1"}, &models.Channel{ChannelId: "TestChannelFromSession1"}}},
+// 	}
 
-func TestChannelFromSession(t *testing.T) {
-	t.Parallel()
-	type args struct {
-		session *models.Session
-		channel *models.Channel
-	}
+// 	for _, test := range tests {
+// 		t.Run(test.name, func(t *testing.T) {
+// 			rw := httptest.NewRecorder()
+// 			req := httptest.NewRequest(http.MethodGet, "/", nil)
+// 			if test.args.session != nil {
+// 				req = req.WithContext(context.WithValue(req.Context(), consts.CtxSession, test.args.session))
+// 			}
+// 			handler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+// 				channel, ok := r.Context().Value(consts.CtxChannel).(*models.Channel)
+// 				if !ok {
+// 					util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrStrResourceDNE)
+// 					return
+// 				}
+// 				util.WriteResponse(rw, util.Response{
+// 					Status: http.StatusOK,
+// 					Data:   channel,
+// 				})
+// 			})
+// 			if test.existsInDB {
+// 				test.args.channel.R = util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
+// 				err := test.args.channel.Create(req.Context())
+// 				assert.NoError(t, err)
+// 			}
 
-	tests := []struct {
-		name           string
-		existsInDB     bool
-		expectedStatus int
-		args           args
-	}{
-		{"no session", false, http.StatusUnauthorized, args{nil, nil}},
-		{"not in db", false, http.StatusInternalServerError, args{&models.Session{SelectedChannel: primitive.ObjectID{}, SessionId: "1"}, &models.Channel{ChannelId: "123"}}},
-		{"valid", true, http.StatusOK, args{&models.Session{SelectedChannel: primitive.ObjectID{}, SessionId: "1"}, &models.Channel{ChannelId: "123"}}},
-	}
+// 			testHandler := ChannelFromSession(handler)
+// 			testHandler.ServeHTTP(rw, req)
+// 			assert.Equal(t, test.expectedStatus, rw.Code)
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			rw := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
-			if test.args.session != nil {
-				req = req.WithContext(context.WithValue(req.Context(), consts.CtxSession, test.args.session))
-			}
-			handler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-				channel, ok := r.Context().Value(consts.CtxChannel).(*models.Channel)
-				if !ok {
-					util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrStrResourceDNE)
-					return
-				}
-				util.WriteResponse(rw, util.Response{
-					Status: http.StatusOK,
-					Data:   channel,
-				})
-			})
-			if test.existsInDB {
-				mockRepo.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewChannel(mockRepo)).Return(nil).Run(func(args mock.Arguments) {
-					arg := args.Get(2).(*models.Channel)
-					arg.ChannelId = test.args.channel.ChannelId
-					arg.SetLoaded(true)
-				}).Once()
-			} else {
-				mockRepo.On("FindOne", req.Context(), bson.M{"_id": primitive.ObjectID{}}, models.NewChannel(mockRepo)).Return(nil).Once()
+// 			if test.existsInDB {
+// 				result := rw.Result()
+// 				returnedChannel := &models.Channel{}
+// 				err := json.NewDecoder(result.Body).Decode(returnedChannel)
+// 				assert.NoError(t, err)
 
-			}
+// 				assert.Equal(t, test.args.channel.ChannelId, returnedChannel.ChannelId)
 
-			testHandler := ChannelFromSession(handler)
-			testHandler.ServeHTTP(rw, req)
-			assert.Equal(t, test.expectedStatus, rw.Code)
+// 				err = test.args.channel.Delete(req.Context())
+// 				assert.NoError(t, err)
 
-			if test.existsInDB {
-				result := rw.Result()
-				returnedChannel := &models.Channel{}
-				err := json.NewDecoder(result.Body).Decode(returnedChannel)
-				assert.NoError(t, err)
-
-				assert.Equal(t, returnedChannel.ChannelId, test.args.channel.ChannelId)
-			}
-		})
-	}
-}
+// 			}
+// 		})
+// 	}
+// }

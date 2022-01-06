@@ -1,25 +1,42 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Build and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
+    env:
+      MONGO_URI: localhost:27017
+      REDIS_URI: localhost:6379
+      JWT_SIGN_KEY: B#77e7d71xGd
+
+    services:
+      mongo:
+        image: mongo
+        ports:
+          - 27017:27017  
+        volumes:
+          - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
 
-    - name: Build
-      run: go build -v ./...
+      - name: Build
+        run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+      - name: Test
+        run: go test -v ./...

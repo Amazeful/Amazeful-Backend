@@ -1,51 +1,40 @@
 package middlewares
 
-import (
-	"context"
-	"net/http"
+// //Authenticator middleware authenticates requests
+// func Authenticator(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-	"github.com/Amazeful/Amazeful-Backend/api/auth"
-	"github.com/Amazeful/Amazeful-Backend/config"
-	"github.com/Amazeful/Amazeful-Backend/consts"
-	"github.com/Amazeful/Amazeful-Backend/models"
-	"github.com/Amazeful/Amazeful-Backend/util"
-	"github.com/lestrrat-go/jwx/jwa"
-)
+// 		//Get the token from cookie
+// 		cookie, err := req.Cookie(auth.JWTCookieName)
+// 		if err != nil {
+// 			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+// 			return
+// 		}
 
-//Authenticator middleware authenticates requests
-func Authenticator(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+// 		//Parse and validate the token
+// 		jwt := models.NewJWT([]byte(config.GetConfig().ServerConfig.JwtSignKey), jwa.HS256)
+// 		t, err := jwt.Decode(cookie.Value)
+// 		if err != nil {
+// 			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+// 			return
+// 		}
+// 		//Get session id from token claims
+// 		sid, ok := t.Get(models.SessionIdKey)
+// 		if !ok {
+// 			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+// 			return
+// 		}
 
-		//Get the token from cookie
-		cookie, err := req.Cookie(auth.JWTCookieName)
-		if err != nil {
-			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
-		}
-		//Parse and validate the token
-		jwt := models.NewJWT([]byte(config.GetConfig().JwtSignKey), jwa.HS256)
-		t, err := jwt.Decode(cookie.Value)
-		if err != nil {
-			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
-		}
-		//Get session id from token claims
-		sid, ok := t.Get(models.SessionIdKey)
-		if !ok {
-			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
-		}
+// 		session := models.NewSession(util.GetRedis())
+// 		session.SessionId = sid.(string)
+// 		err = session.GetSession(req.Context())
+// 		if err != nil {
+// 			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+// 			return
+// 		}
 
-		session := models.NewSession(util.GetRedis())
-		session.SessionId = sid.(string)
-		err = session.GetSession(req.Context())
-		if err != nil {
-			http.Error(rw, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
-		}
+// 		ctx := context.WithValue(req.Context(), consts.CtxSession, session)
 
-		ctx := context.WithValue(req.Context(), consts.CtxSession, session)
-
-		next.ServeHTTP(rw, req.WithContext(ctx))
-	})
-}
+// 		next.ServeHTTP(rw, req.WithContext(ctx))
+// 	})
+// }
