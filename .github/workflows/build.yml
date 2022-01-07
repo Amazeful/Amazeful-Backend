@@ -10,7 +10,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+    env:
+      MONGO_URI: mongodb://localhost:27017
+      REDIS_URI: localhost:6379
+      STATE: test
+      JWT_SIGN_KEY: test
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
+      mongo:
+        image: mongo
+        env:
+          MONGO_INITDB_DATABASE: Amazeful
+        ports:
+          - 27017:27017
+
     steps:
       - uses: actions/checkout@v2
 

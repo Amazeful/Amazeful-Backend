@@ -14,17 +14,16 @@ type Config struct {
 }
 
 func LoadConfig() error {
-	// load dotenv
-	err := godotenv.Load()
-	if err != nil {
-		return err
-	}
+	// load dotenv.
+	//ignoring error, since using .env file is not required. You can set the stuff manually for testing if you wish
+	_ = godotenv.Load()
+
 	cfg := &Config{
 		ServerConfig: defaultServerConfig,
 		TwitchConfig: defaultTwitchConfig,
 	}
 
-	err = env.Parse(cfg)
+	err := env.Parse(cfg)
 	if err != nil {
 		return err
 	}
