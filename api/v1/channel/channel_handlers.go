@@ -9,7 +9,7 @@ import (
 	"github.com/Amazeful/dataful/models"
 )
 
-func (ch *ChannelHandler) HandleGetChannel(rw http.ResponseWriter, req *http.Request) {
+func HandleGetChannel(rw http.ResponseWriter, req *http.Request) {
 	channel, ok := req.Context().Value(consts.CtxChannel).(*models.Channel)
 	if !ok {
 		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrStrResourceDNE)
@@ -19,7 +19,7 @@ func (ch *ChannelHandler) HandleGetChannel(rw http.ResponseWriter, req *http.Req
 	util.WriteResponse(rw, util.Response{Status: http.StatusOK, Data: channel})
 }
 
-func (ch *ChannelHandler) HandleUpdateChannel(rw http.ResponseWriter, req *http.Request) {
+func HandleUpdateChannel(rw http.ResponseWriter, req *http.Request) {
 	channel, ok := req.Context().Value(consts.CtxChannel).(*models.Channel)
 	if !ok {
 		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)

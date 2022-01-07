@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/Amazeful/Amazeful-Backend/util"
 
 	"github.com/Amazeful/dataful"
@@ -15,31 +16,33 @@ import (
 
 const JWTCookieName = "amazing_token"
 
-func (ah *AuthHandler) HandleTwitchLogin(rw http.ResponseWriter, req *http.Request) {
-	oauthConfig := ah.Config.GetOauthConfig()
-	http.Redirect(rw, req, oauthConfig.AuthCodeURL(ah.Config.TwitchConfig.State), http.StatusTemporaryRedirect)
+func HandleTwitchLogin(rw http.ResponseWriter, req *http.Request) {
+	cfg := config.GetConfig()
+	http.Redirect(rw, req, cfg.GetTwitchOauthConfig().AuthCodeURL(cfg.TwitchConfig.State), http.StatusTemporaryRedirect)
 }
 
-func (ah *AuthHandler) HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
+func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
+	cfg := config.GetConfig()
+
 	state := req.URL.Query().Get("state")
 	code := req.URL.Query().Get("code")
 
 	//Check state value
-	if ah.Config.TwitchConfig.State != state {
+	if cfg.TwitchConfig.State != state {
 		err := fmt.Errorf("invalid state value received -- %s", state)
 		util.WriteError(rw, err, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
 		return
 	}
 
 	//Use the code to get tokens from twitch
-	token, err := ah.Config.GetOauthConfig().Exchange(req.Context(), code)
+	token, err := cfg.GetTwitchOauthConfig().Exchange(req.Context(), code)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
 		return
 	}
 
 	//Create api client
-	client, err := ah.TwitchAPI.NewAPI(&helix.Options{UserAccessToken: token.AccessToken})
+	client, err := helix.NewClient(&helix.Options{ClientID: cfg.TwitchConfig.ClientID, UserAccessToken: token.AccessToken})
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 		return
@@ -59,8 +62,8 @@ func (ah *AuthHandler) HandleTwitchCallback(rw http.ResponseWriter, req *http.Re
 		return
 	}
 
-	ru := ah.DB.Repository(dataful.DBAmazeful, dataful.CollectionUser)
-	rc := ah.DB.Repository(dataful.DBAmazeful, dataful.CollectionChannel)
+	ru := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionUser)
+	rc := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
 
 	channel := models.NewChannel(rc)
 	err = channel.FindByChannelId(req.Context(), twitchChannel.Data.BroadcasterID)
@@ -125,13 +128,13 @@ func (ah *AuthHandler) HandleTwitchCallback(rw http.ResponseWriter, req *http.Re
 	expiry := time.Now().Add(time.Hour * 24)
 
 	//Make a new session for user
-	session := models.NewSession(ah.Cache)
+	session := models.NewSession(util.GetCache())
 	session.GenerateSessionId()
 	session.User = user.ID
 	session.SelectedChannel = channel.ID
 
 	//Make a new jwt for token
-	jwt := models.NewJWT([]byte(ah.Config.ServerConfig.JwtSignKey), jwa.HS256)
+	jwt := models.NewJWT([]byte(cfg.ServerConfig.JwtSignKey), jwa.HS256)
 	tokenString, err := jwt.Encode(session.SessionId, expiry)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))

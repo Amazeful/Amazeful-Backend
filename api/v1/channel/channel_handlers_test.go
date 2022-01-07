@@ -1,125 +1,106 @@
 package channel
 
-import (
-	"bytes"
-	"context"
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"testing"
+// func TestHandleGetChannel(t *testing.T) {
+// 	channelHandler := NewChannelHandler(&util.Resources{})
+// 	handler := http.HandlerFunc(channelHandler.HandleGetChannel)
 
-	"github.com/Amazeful/Amazeful-Backend/consts"
-	"github.com/Amazeful/Amazeful-Backend/util"
-	"github.com/Amazeful/dataful"
-	"github.com/Amazeful/dataful/mocks"
-	"github.com/Amazeful/dataful/models"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
-	"go.mongodb.org/mongo-driver/mongo"
-)
+// 	type args struct {
+// 		channel *models.Channel
+// 	}
 
-func TestHandleGetChannel(t *testing.T) {
-	channelHandler := NewChannelHandler(&util.Resources{})
-	handler := http.HandlerFunc(channelHandler.HandleGetChannel)
+// 	tests := []struct {
+// 		name           string
+// 		wantBool       bool
+// 		expectedStatus int
+// 		args           args
+// 	}{
+// 		{"valid context", true, http.StatusOK, args{&models.Channel{BroadcasterName: "Amazeful"}}},
+// 		{"invalid context", false, http.StatusInternalServerError, args{&models.Channel{BroadcasterName: "Amazeful"}}},
+// 	}
 
-	type args struct {
-		channel *models.Channel
-	}
+// 	for _, test := range tests {
+// 		t.Run(test.name, func(t *testing.T) {
+// 			rw := httptest.NewRecorder()
+// 			req := httptest.NewRequest(http.MethodGet, "/", nil)
+// 			if test.wantBool {
+// 				req = req.WithContext(context.WithValue(req.Context(), consts.CtxChannel, test.args.channel))
+// 			}
 
-	tests := []struct {
-		name           string
-		wantBool       bool
-		expectedStatus int
-		args           args
-	}{
-		{"valid context", true, http.StatusOK, args{&models.Channel{BroadcasterName: "Amazeful"}}},
-		{"invalid context", false, http.StatusInternalServerError, args{&models.Channel{BroadcasterName: "Amazeful"}}},
-	}
+// 			handler.ServeHTTP(rw, req)
+// 			assert.Equal(t, test.expectedStatus, rw.Code)
+// 			if test.wantBool {
+// 				result := &models.Channel{}
+// 				json.NewDecoder(rw.Result().Body).Decode(result)
+// 				assert.Equal(t, test.args.channel.ChannelId, result.ChannelId)
+// 			}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			rw := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
-			if test.wantBool {
-				req = req.WithContext(context.WithValue(req.Context(), consts.CtxChannel, test.args.channel))
-			}
+// 		})
+// 	}
 
-			handler.ServeHTTP(rw, req)
-			assert.Equal(t, test.expectedStatus, rw.Code)
-			if test.wantBool {
-				result := &models.Channel{}
-				json.NewDecoder(rw.Result().Body).Decode(result)
-				assert.Equal(t, test.args.channel.ChannelId, result.ChannelId)
-			}
+// }
 
-		})
-	}
+// func TestHandleUpdateChannel(t *testing.T) {
+// 	t.Parallel()
+// 	changedChannel := &models.Channel{Joined: false, Prefix: "%", Silenced: true}
+// 	b, err := json.Marshal(changedChannel)
+// 	require.NoError(t, err)
 
-}
+// 	tests := []struct {
+// 		name           string
+// 		wantErr        bool
+// 		updateErr      bool
+// 		hasContext     bool
+// 		expectedStatus int
+// 	}{
+// 		{"successfull update", false, false, true, http.StatusOK},
+// 		{"unsuccessfull update", true, true, true, http.StatusInternalServerError},
+// 		{"invalid context", true, false, false, http.StatusInternalServerError},
+// 	}
 
-func TestHandleUpdateChannel(t *testing.T) {
-	t.Parallel()
-	changedChannel := &models.Channel{Joined: false, Prefix: "%", Silenced: true}
-	b, err := json.Marshal(changedChannel)
-	require.NoError(t, err)
+// 	for _, test := range tests {
+// 		t.Run(test.name, func(t *testing.T) {
+// 			rw := httptest.NewRecorder()
+// 			req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(b))
+// 			db := new(mocks.Database)
+// 			repository := new(mocks.Repository)
+// 			db.On("Repository", dataful.DBAmazeful, dataful.CollectionChannel).Return(repository)
+// 			if test.hasContext {
 
-	tests := []struct {
-		name           string
-		wantErr        bool
-		updateErr      bool
-		hasContext     bool
-		expectedStatus int
-	}{
-		{"successfull update", false, false, true, http.StatusOK},
-		{"unsuccessfull update", true, true, true, http.StatusInternalServerError},
-		{"invalid context", true, false, false, http.StatusInternalServerError},
-	}
+// 				channel := models.NewChannel(repository)
+// 				channel.SetLoaded(true)
+// 				channel.Joined = true
+// 				channel.Silenced = false
+// 				channel.Prefix = "!"
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			rw := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, "/", bytes.NewBuffer(b))
-			db := new(mocks.Database)
-			repository := new(mocks.Repository)
-			db.On("Repository", dataful.DBAmazeful, dataful.CollectionChannel).Return(repository)
-			if test.hasContext {
+// 				req = req.WithContext(context.WithValue(req.Context(), consts.CtxChannel, channel))
+// 				if test.updateErr {
+// 					repository.On("ReplaceOne", req.Context(), mock.Anything, channel, mock.Anything).Return(mongo.ErrNoDocuments)
+// 				} else {
+// 					repository.On("ReplaceOne", req.Context(), mock.Anything, channel, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+// 						arg := args.Get(2).(*models.Channel)
+// 						arg.Joined = changedChannel.Joined
+// 						arg.Silenced = changedChannel.Silenced
+// 						arg.Prefix = changedChannel.Prefix
+// 					})
+// 				}
+// 			}
 
-				channel := models.NewChannel(repository)
-				channel.SetLoaded(true)
-				channel.Joined = true
-				channel.Silenced = false
-				channel.Prefix = "!"
+// 			channelHandler := NewChannelHandler(&util.Resources{DB: db})
+// 			handler := http.HandlerFunc(channelHandler.HandleUpdateChannel)
+// 			handler.ServeHTTP(rw, req)
 
-				req = req.WithContext(context.WithValue(req.Context(), consts.CtxChannel, channel))
-				if test.updateErr {
-					repository.On("ReplaceOne", req.Context(), mock.Anything, channel, mock.Anything).Return(mongo.ErrNoDocuments)
-				} else {
-					repository.On("ReplaceOne", req.Context(), mock.Anything, channel, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-						arg := args.Get(2).(*models.Channel)
-						arg.Joined = changedChannel.Joined
-						arg.Silenced = changedChannel.Silenced
-						arg.Prefix = changedChannel.Prefix
-					})
-				}
-			}
+// 			assert.Equal(t, test.expectedStatus, rw.Code)
 
-			channelHandler := NewChannelHandler(&util.Resources{DB: db})
-			handler := http.HandlerFunc(channelHandler.HandleUpdateChannel)
-			handler.ServeHTTP(rw, req)
+// 			if !test.wantErr {
+// 				received := &models.Channel{}
+// 				json.NewDecoder(rw.Result().Body).Decode(received)
+// 				assert.Equal(t, changedChannel.Title, received.Title)
+// 				assert.Equal(t, changedChannel.Silenced, received.Silenced)
+// 				assert.Equal(t, changedChannel.Prefix, received.Prefix)
 
-			assert.Equal(t, test.expectedStatus, rw.Code)
+// 			}
 
-			if !test.wantErr {
-				received := &models.Channel{}
-				json.NewDecoder(rw.Result().Body).Decode(received)
-				assert.Equal(t, changedChannel.Title, received.Title)
-				assert.Equal(t, changedChannel.Silenced, received.Silenced)
-				assert.Equal(t, changedChannel.Prefix, received.Prefix)
+// 		})
+// 	}
 
-			}
-
-		})
-	}
-
-}
+// }

@@ -1,101 +1,111 @@
 package command
 
-// func HandleCreateCommand(rw http.ResponseWriter, req *http.Request) {
-// 	channel, ok := req.Context().Value(consts.CtxChannel).(*models.Channel)
-// 	if !ok {
-// 		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
-// 		return
-// 	}
+import (
+	"encoding/json"
+	"net/http"
 
-// 	r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
-// 	command := models.NewCommand(r)
+	"github.com/Amazeful/Amazeful-Backend/consts"
+	"github.com/Amazeful/Amazeful-Backend/util"
+	"github.com/Amazeful/dataful"
+	"github.com/Amazeful/dataful/models"
+)
 
-// 	err := json.NewDecoder(req.Body).Decode(command)
-// 	if err != nil {
-// 		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDecode)
-// 		return
-// 	}
+func HandleCreateCommand(rw http.ResponseWriter, req *http.Request) {
+	channel, ok := req.Context().Value(consts.CtxChannel).(*models.Channel)
+	if !ok {
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		return
+	}
 
-// 	command.ID = channel.ID
+	r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
+	command := models.NewCommand(r)
 
-// 	err = command.Create(req.Context())
-// 	if err != nil {
-// 		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
-// 		return
-// 	}
+	err := json.NewDecoder(req.Body).Decode(command)
+	if err != nil {
+		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDecode)
+		return
+	}
 
-// 	util.WriteResponse(rw, util.Response{
-// 		Status: http.StatusCreated,
-// 		Data:   command,
-// 	})
-// }
+	command.ID = channel.ID
 
-// func HandleGetCommand(rw http.ResponseWriter, req *http.Request) {
-// 	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
-// 	if !ok {
-// 		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
-// 		return
-// 	}
+	err = command.Create(req.Context())
+	if err != nil {
+		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
+		return
+	}
 
-// 	util.WriteResponse(rw, util.Response{
-// 		Status: http.StatusOK,
-// 		Data:   command,
-// 	})
-// }
+	util.WriteResponse(rw, util.Response{
+		Status: http.StatusCreated,
+		Data:   command,
+	})
+}
 
-// func HandleUpdateCommand(rw http.ResponseWriter, req *http.Request) {
-// 	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
-// 	if !ok {
-// 		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
-// 		return
-// 	}
+func HandleGetCommand(rw http.ResponseWriter, req *http.Request) {
+	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
+	if !ok {
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		return
+	}
 
-// 	r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
-// 	updatedCommand := models.NewCommand(r)
+	util.WriteResponse(rw, util.Response{
+		Status: http.StatusOK,
+		Data:   command,
+	})
+}
 
-// 	err := json.NewDecoder(req.Body).Decode(updatedCommand)
-// 	if err != nil {
-// 		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDecode)
-// 		return
-// 	}
+func HandleUpdateCommand(rw http.ResponseWriter, req *http.Request) {
+	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
+	if !ok {
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		return
+	}
 
-// 	command.Enabled = updatedCommand.Enabled
-// 	command.Cooldowns = updatedCommand.Cooldowns
-// 	command.Role = updatedCommand.Role
-// 	command.Stream = updatedCommand.Stream
-// 	command.Response = updatedCommand.Response
-// 	command.Aliases = updatedCommand.Aliases
-// 	command.Attributes = updatedCommand.Attributes
-// 	command.Timer = updatedCommand.Timer
-// 	command.Attributes = updatedCommand.Attributes
+	r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
+	updatedCommand := models.NewCommand(r)
 
-// 	err = command.Create(req.Context())
-// 	if err != nil {
-// 		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
-// 		return
-// 	}
+	err := json.NewDecoder(req.Body).Decode(updatedCommand)
+	if err != nil {
+		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDecode)
+		return
+	}
 
-// 	util.WriteResponse(rw, util.Response{
-// 		Status: http.StatusOK,
-// 		Data:   command,
-// 	})
-// }
+	command.Enabled = updatedCommand.Enabled
+	command.Cooldowns = updatedCommand.Cooldowns
+	command.Role = updatedCommand.Role
+	command.Stream = updatedCommand.Stream
+	command.Response = updatedCommand.Response
+	command.Aliases = updatedCommand.Aliases
+	command.Attributes = updatedCommand.Attributes
+	command.Timer = updatedCommand.Timer
+	command.Attributes = updatedCommand.Attributes
 
-// func HandleDeleteCommand(rw http.ResponseWriter, req *http.Request) {
-// 	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
-// 	if !ok {
-// 		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
-// 		return
-// 	}
+	err = command.Create(req.Context())
+	if err != nil {
+		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
+		return
+	}
 
-// 	err := command.Delete(req.Context())
-// 	if err != nil {
-// 		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrDB)
-// 		return
-// 	}
+	util.WriteResponse(rw, util.Response{
+		Status: http.StatusOK,
+		Data:   command,
+	})
+}
 
-// 	util.WriteResponse(rw, util.Response{
-// 		Status: http.StatusOK,
-// 		Data:   command,
-// 	})
-// }
+func HandleDeleteCommand(rw http.ResponseWriter, req *http.Request) {
+	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
+	if !ok {
+		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		return
+	}
+
+	err := command.Delete(req.Context())
+	if err != nil {
+		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrDB)
+		return
+	}
+
+	util.WriteResponse(rw, util.Response{
+		Status: http.StatusOK,
+		Data:   command,
+	})
+}

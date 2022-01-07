@@ -6,32 +6,40 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var config *Config
+
 type Config struct {
 	ServerConfig *ServerConfig
 	TwitchConfig *TwitchConfig
 }
 
-func LoadConfig() (*Config, error) {
+func LoadConfig() error {
 	// load dotenv
 	err := godotenv.Load()
 	if err != nil {
-		return nil, err
+		return err
 	}
-	config := &Config{
+	cfg := &Config{
 		ServerConfig: defaultServerConfig,
 		TwitchConfig: defaultTwitchConfig,
 	}
 
-	err = env.Parse(config)
+	err = env.Parse(cfg)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	validate := validator.New()
-	err = validate.Struct(config)
+	err = validate.Struct(cfg)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return config, nil
+	config = cfg
+
+	return nil
+}
+
+func GetConfig() *Config {
+	return config
 }

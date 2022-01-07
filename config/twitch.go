@@ -11,7 +11,7 @@ type TwitchConfig struct {
 	State        string `env:"TWITCH_STATE" validate:"required"`
 }
 
-func (c *Config) GetOauthConfig() *oauth2.Config {
+func (c *Config) GetTwitchOauthConfig() *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     c.TwitchConfig.ClientID,
 		ClientSecret: c.TwitchConfig.ClientSecret,

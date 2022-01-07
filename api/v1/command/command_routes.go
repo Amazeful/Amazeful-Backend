@@ -1,12 +1,14 @@
 package command
 
-// func ProcessRoutes(r chi.Router) {
+import "github.com/go-chi/chi/v5"
 
-// 	r.Route("/{commandId}", func(r chi.Router) {
-// 		r.Get("/", HandleGetCommand)
-// 		r.Post("/", HandleCreateCommand)
-// 		r.Patch("/", HandleUpdateCommand)
-// 		r.Delete("/", HandleDeleteCommand)
-// 	})
+func ProcessRoutes(r chi.Router) {
 
-// }
+	r.Route("/{commandId}", func(r chi.Router) {
+		r.Get("/", HandleGetCommand)
+		r.Post("/", HandleCreateCommand)
+		r.Patch("/", HandleUpdateCommand)
+		r.Delete("/", HandleDeleteCommand)
+	})
+
+}
