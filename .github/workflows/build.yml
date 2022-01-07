@@ -13,6 +13,8 @@ jobs:
     env:
       MONGO_URI: mongodb://localhost:27017
       REDIS_URI: localhost:6379
+      TWITCH_CLIENT_ID: test
+      TWITCH_CLIENT_SECRET: test
       STATE: test
       JWT_SIGN_KEY: test
 
