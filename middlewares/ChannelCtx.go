@@ -61,27 +61,3 @@ func ChannelFromId(next http.Handler) http.Handler {
 		next.ServeHTTP(rw, req.WithContext(ctx))
 	})
 }
-
-// func ChannelFromParam(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-// 		channelName := chi.URLParam(req, "channelName")
-// 		if channelName == "" {
-// 			http.Error(rw, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-// 			return
-// 		}
-
-// 		r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
-// 		channel := models.NewChannel(r)
-// 		err := channel.FindByChannelName(req.Context(), channelName)
-// 		if err != nil {
-// 			util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-// 			return
-// 		}
-// 		if !channel.Loaded() {
-// 			http.Error(rw, consts.ErrStrResourceDNE, http.StatusNotFound)
-// 			return
-// 		}
-// 		ctx := context.WithValue(req.Context(), consts.CtxChannel, channel)
-// 		next.ServeHTTP(rw, req.WithContext(ctx))
-// 	})
-// }
