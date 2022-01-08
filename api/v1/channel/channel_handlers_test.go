@@ -1,21 +1,12 @@
 package channel
 
-import (
-	"context"
-	"testing"
+// func TestHandleGetChannel(t *testing.T) {
+// 	err := config.LoadConfig()
+// 	assert.NoError(t, err)
 
-	"github.com/Amazeful/Amazeful-Backend/config"
-	"github.com/Amazeful/Amazeful-Backend/util"
-	"github.com/stretchr/testify/assert"
-)
-
-func TestHandleGetChannel(t *testing.T) {
-	err := config.LoadConfig()
-	assert.NoError(t, err)
-
-	err = util.InitDB(context.Background())
-	assert.NoError(t, err)
-}
+// 	err = util.InitDB(context.Background())
+// 	assert.NoError(t, err)
+// }
 
 // func TestHandleGetChannel(t *testing.T) {
 // 	channelHandler := NewChannelHandler(&util.Resources{})

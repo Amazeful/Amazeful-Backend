@@ -15,7 +15,6 @@ type ServerConfig struct {
 
 var defaultServerConfig = &ServerConfig{
 	IpAddress:  "127.0.0.1",
-	ServerURL:  "http://localhost:8000",
 	MongoURI:   "localhost:27017",
 	RedisURI:   "localhost:6379",
 	Port:       "8000",

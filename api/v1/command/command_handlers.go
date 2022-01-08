@@ -13,7 +13,7 @@ import (
 func HandleCreateCommand(rw http.ResponseWriter, req *http.Request) {
 	channel, ok := req.Context().Value(consts.CtxChannel).(*models.Channel)
 	if !ok {
-		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -30,7 +30,7 @@ func HandleCreateCommand(rw http.ResponseWriter, req *http.Request) {
 
 	err = command.Create(req.Context())
 	if err != nil {
-		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
+		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrDB)
 		return
 	}
 
@@ -43,7 +43,7 @@ func HandleCreateCommand(rw http.ResponseWriter, req *http.Request) {
 func HandleGetCommand(rw http.ResponseWriter, req *http.Request) {
 	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
 	if !ok {
-		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -56,7 +56,7 @@ func HandleGetCommand(rw http.ResponseWriter, req *http.Request) {
 func HandleUpdateCommand(rw http.ResponseWriter, req *http.Request) {
 	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
 	if !ok {
-		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -81,7 +81,7 @@ func HandleUpdateCommand(rw http.ResponseWriter, req *http.Request) {
 
 	err = command.Create(req.Context())
 	if err != nil {
-		util.WriteError(rw, err, http.StatusBadRequest, consts.ErrStrDB)
+		util.WriteError(rw, err, http.StatusInternalServerError, consts.ErrStrDB)
 		return
 	}
 
@@ -94,7 +94,7 @@ func HandleUpdateCommand(rw http.ResponseWriter, req *http.Request) {
 func HandleDeleteCommand(rw http.ResponseWriter, req *http.Request) {
 	command, ok := req.Context().Value(consts.CtxCommand).(*models.Command)
 	if !ok {
-		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrUnexpected)
+		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 

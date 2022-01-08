@@ -11,7 +11,7 @@ import (
 func HandleGetUser(rw http.ResponseWriter, req *http.Request) {
 	user, ok := req.Context().Value(consts.CtxUser).(*models.User)
 	if !ok {
-		util.WriteError(rw, consts.ErrNoContextValue, http.StatusInternalServerError, consts.ErrStrResourceDNE)
+		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 

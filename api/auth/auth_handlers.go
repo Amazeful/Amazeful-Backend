@@ -66,12 +66,12 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 	rc := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
 
 	channel := models.NewChannel(rc)
-	err = channel.FindByChannelId(req.Context(), twitchChannel.Data.BroadcasterID)
+	err = channel.LoadByChannelId(req.Context(), twitchChannel.Data.BroadcasterID)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 		return
 	}
-	channel.ChannelId = twitchChannel.Data.BroadcasterID
+
 	channel.BroadcasterName = twitchChannel.Data.BroadcasterName
 	channel.Language = twitchChannel.Data.BroadcasterLanguage
 	channel.GameId = twitchChannel.Data.GameID
@@ -90,12 +90,12 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 
 	//make a new user using tokens
 	user := models.NewUser(ru)
-	err = user.FindByUserId(req.Context(), twitchUser.Data.ID)
+	err = user.LoadByUserId(req.Context(), twitchUser.Data.ID)
 	if err != nil {
 		util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 		return
 	}
-	user.UserID = twitchUser.Data.ID
+
 	user.Login = twitchUser.Data.Login
 	user.DisplayName = twitchUser.Data.DisplayName
 	user.Type = twitchUser.Data.Type

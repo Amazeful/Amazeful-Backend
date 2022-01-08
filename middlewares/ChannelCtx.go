@@ -41,13 +41,13 @@ func ChannelFromId(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		channelId, err := primitive.ObjectIDFromHex(chi.URLParam(req, "channelId"))
 		if err != nil {
-			http.Error(rw, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			util.WriteError(rw, err, http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 			return
 		}
 
 		r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
 		channel := models.NewChannel(r)
-		err = channel.FindBylId(req.Context(), channelId)
+		err = channel.LoadBylId(req.Context(), channelId)
 		if err != nil {
 			util.WriteError(rw, err, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 			return
