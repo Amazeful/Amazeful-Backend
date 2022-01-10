@@ -37,6 +37,7 @@ import (
 // 	})
 // }
 
+//ChannelFromId middleware adds the channel data to request context using channelId url param.
 func ChannelFromId(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		channelId, err := primitive.ObjectIDFromHex(chi.URLParam(req, "channelId"))

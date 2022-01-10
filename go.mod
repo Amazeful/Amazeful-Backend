@@ -3,7 +3,7 @@ module github.com/Amazeful/Amazeful-Backend
 go 1.17
 
 require (
-	github.com/Amazeful/dataful v0.0.0-20220108224508-8c149766a820
+	github.com/Amazeful/dataful v0.0.0-20220110065139-9fffead8dee9
 	github.com/Amazeful/helix v1.25.1-0.20211227025021-0ab38f39a674
 	github.com/caarlos0/env/v6 v6.9.1
 	github.com/go-chi/chi/v5 v5.0.7

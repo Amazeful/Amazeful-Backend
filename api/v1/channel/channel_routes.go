@@ -12,6 +12,5 @@ func ProcessRoutes(r chi.Router) {
 		r.Patch("/", HandleUpdateChannel)
 		r.Get("/commands", HandleGetChannelCommands)
 		r.Get("/filters", HandleGetChannelFilters)
-		// r.Put("/new-command", HandleCreateCommand)
 	})
 }
