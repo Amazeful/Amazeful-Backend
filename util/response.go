@@ -17,7 +17,7 @@ type Response struct {
 //WriteError writes errString to http and logs the actual error
 func WriteError(rw http.ResponseWriter, err error, errCode int, errString string) {
 	http.Error(rw, errString, errCode)
-	GetLogger().Error(errString, zap.Error(err))
+	Logger().Error(errString, zap.Error(err))
 }
 
 //WriteResponse writes http response
@@ -29,7 +29,7 @@ func WriteResponse(rw http.ResponseWriter, data Response) {
 	}
 
 	if data.Message != "" {
-		GetLogger().Info(data.Message)
+		Logger().Info(data.Message)
 	}
 
 	rw.Header().Set("Content-Type", "application/json")

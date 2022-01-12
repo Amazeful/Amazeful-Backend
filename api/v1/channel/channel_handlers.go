@@ -58,7 +58,7 @@ func HandleGetChannelCommands(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
+	r := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
 
 	commandList := models.NewCommandList(r)
 
@@ -83,7 +83,7 @@ func HandleGetChannelFilters(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionFilters)
+	r := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionFilters)
 
 	filters := models.NewFilters(r)
 	err := filters.LoadByChannel(req.Context(), channel.ID)

@@ -3,25 +3,19 @@ package util
 import (
 	"context"
 
-	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/Amazeful/dataful"
 )
 
 var cache dataful.Cache
 
 //InitCache initializes the cache
-func InitCache(ctx context.Context) error {
-	config := config.GetConfig()
-	client, err := dataful.NewRedis(ctx, config.ServerConfig.RedisURI, config.ServerConfig.RedisPassword)
-	if err != nil {
-		return err
-	}
-
-	cache = client
-	return nil
+func InitCache(ctx context.Context, uri, password string) error {
+	var err error
+	cache, err = dataful.NewRedis(ctx, uri, password)
+	return err
 }
 
-//GetCache returns global cache
-func GetCache() dataful.Cache {
+//Cache returns global cache
+func Cache() dataful.Cache {
 	return cache
 }

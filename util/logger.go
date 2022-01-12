@@ -1,21 +1,22 @@
 package util
 
-import "go.uber.org/zap"
+import (
+	"sync"
 
+	"go.uber.org/zap"
+)
+
+var loggerOnce sync.Once
 var logger *zap.Logger
 
 //InitLogger initializes the logger
 func InitLogger() error {
-	lg, err := zap.NewProduction()
-	if err != nil {
-		return err
-	}
-
-	logger = lg
-	return nil
+	var err error
+	logger, err = zap.NewProduction()
+	return err
 }
 
 //GetLogger returns global logger
-func GetLogger() *zap.Logger {
+func Logger() *zap.Logger {
 	return logger
 }

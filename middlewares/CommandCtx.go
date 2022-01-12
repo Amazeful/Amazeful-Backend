@@ -21,7 +21,7 @@ func CommandFromId(next http.Handler) http.Handler {
 			return
 		}
 
-		r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
+		r := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
 		command := models.NewCommand(r)
 		err = command.LoadBylId(req.Context(), commandId)
 		if err != nil {

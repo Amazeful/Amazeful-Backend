@@ -13,11 +13,11 @@ jobs:
     env:
       MONGO_URI: mongodb://localhost:27017
       REDIS_URI: localhost:6379
-      TWITCH_CLIENT_ID: test
-      TWITCH_CLIENT_SECRET: test
-      STATE: test
-      JWT_SIGN_KEY: test
-
+      TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+      TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+      STATE: 83UEk*y2AaEfu$2nhx8kJ16QU
+      JWT_SIGN_KEY: p5q$hQq5p5TecDwHJK&3R6CBB
+      
     services:
       redis:
         image: redis
@@ -26,8 +26,6 @@ jobs:
 
       mongo:
         image: mongo
-        env:
-          MONGO_INITDB_DATABASE: Amazeful
         ports:
           - 27017:27017
 

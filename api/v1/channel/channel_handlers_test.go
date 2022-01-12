@@ -1,51 +1,92 @@
 package channel
 
-// func TestHandleGetChannel(t *testing.T) {
-// 	err := config.LoadConfig()
-// 	assert.NoError(t, err)
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
 
-// 	err = util.InitDB(context.Background())
-// 	assert.NoError(t, err)
-// }
+	"github.com/Amazeful/Amazeful-Backend/consts"
+	"github.com/Amazeful/Amazeful-Backend/util"
+	"github.com/Amazeful/dataful"
+	"github.com/Amazeful/dataful/models"
+	"github.com/go-playground/assert/v2"
+)
 
-// func TestHandleGetChannel(t *testing.T) {
-// 	channelHandler := NewChannelHandler(&util.Resources{})
-// 	handler := http.HandlerFunc(channelHandler.HandleGetChannel)
+// import (
+// 	"context"
+// 	"encoding/json"
+// 	"net/http"
+// 	"net/http/httptest"
+// 	"testing"
 
-// 	type args struct {
-// 		channel *models.Channel
-// 	}
+// 	"github.com/Amazeful/Amazeful-Backend/consts"
+// 	"github.com/Amazeful/dataful/models"
+// 	"github.com/go-playground/assert/v2"
+// )
 
-// 	tests := []struct {
-// 		name           string
-// 		wantBool       bool
-// 		expectedStatus int
-// 		args           args
-// 	}{
-// 		{"valid context", true, http.StatusOK, args{&models.Channel{BroadcasterName: "Amazeful"}}},
-// 		{"invalid context", false, http.StatusInternalServerError, args{&models.Channel{BroadcasterName: "Amazeful"}}},
-// 	}
+// // func TestHandleGetChannel(t *testing.T) {
+// // 	err := config.LoadConfig()
+// // 	assert.NoError(t, err)
 
-// 	for _, test := range tests {
-// 		t.Run(test.name, func(t *testing.T) {
-// 			rw := httptest.NewRecorder()
-// 			req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 			if test.wantBool {
-// 				req = req.WithContext(context.WithValue(req.Context(), consts.CtxChannel, test.args.channel))
-// 			}
+// // 	err = util.InitDB(context.Background())
+// // 	assert.NoError(t, err)
+// // }
 
-// 			handler.ServeHTTP(rw, req)
-// 			assert.Equal(t, test.expectedStatus, rw.Code)
-// 			if test.wantBool {
-// 				result := &models.Channel{}
-// 				json.NewDecoder(rw.Result().Body).Decode(result)
-// 				assert.Equal(t, test.args.channel.ChannelId, result.ChannelId)
-// 			}
+func TestHandleGetChannel(t *testing.T) {
+	r := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
+	testChannel := &models.Channel{
+		BaseModel:       dataful.NewBaseModel(r),
+		ChannelId:       "138760387",
+		BroadcasterName: "Amazeful",
+		Language:        "en",
+		GameId:          "1",
+		GameName:        "Just Chatting",
+		Title:           "FeelsDankMan",
+		Joined:          true,
+		Prefix:          "!",
+		Shard:           1,
+		StartedAt:       time.Now().Add(-time.Hour).UTC(),
+		Moderator:       true,
+	}
 
-// 		})
-// 	}
+	handler := http.HandlerFunc(HandleGetChannel)
 
-// }
+	tests := []struct {
+		name           string
+		hasContext     bool
+		expectedStatus int
+	}{
+		{"valid context", true, http.StatusOK},
+		{"invalid context", false, http.StatusInternalServerError},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rw := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			if test.hasContext {
+				req = req.WithContext(context.WithValue(req.Context(), consts.CtxChannel, testChannel))
+			}
+
+			handler.ServeHTTP(rw, req)
+			assert.Equal(t, test.expectedStatus, rw.Code)
+			if test.hasContext {
+				result := &models.Channel{
+					BaseModel: dataful.NewBaseModel(r),
+				}
+
+				json.NewDecoder(rw.Result().Body).Decode(result)
+
+				assert.Equal(t, result, testChannel)
+			}
+
+		})
+	}
+
+}
 
 // func TestHandleUpdateChannel(t *testing.T) {
 // 	t.Parallel()

@@ -46,7 +46,7 @@ func ChannelFromId(next http.Handler) http.Handler {
 			return
 		}
 
-		r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
+		r := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
 		channel := models.NewChannel(r)
 		err = channel.LoadBylId(req.Context(), channelId)
 		if err != nil {

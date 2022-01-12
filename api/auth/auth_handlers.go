@@ -62,8 +62,8 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	ru := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionUser)
-	rc := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
+	ru := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionUser)
+	rc := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionChannel)
 
 	channel := models.NewChannel(rc)
 	err = channel.LoadByChannelId(req.Context(), twitchChannel.Data.BroadcasterID)
@@ -128,7 +128,7 @@ func HandleTwitchCallback(rw http.ResponseWriter, req *http.Request) {
 	expiry := time.Now().Add(time.Hour * 24)
 
 	//Make a new session for user
-	session := models.NewSession(util.GetCache())
+	session := models.NewSession(util.Cache())
 	session.GenerateSessionId()
 	session.User = user.ID
 	session.SelectedChannel = channel.ID

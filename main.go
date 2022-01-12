@@ -13,50 +13,51 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
-	"go.uber.org/zap"
+	"github.com/joho/godotenv"
 )
 
 var (
 	reqTimeout   = 2 * time.Minute
 	requestLimit = 10
 	limitTimeout = 10 * time.Second
+	ctx, cancel  = context.WithTimeout(context.Background(), 5*time.Minute)
 )
 
 func main() {
-	//setup the logger
+	initConfig()
+	initServices()
+	defer cleanupServices()
+	initServer()
+}
+
+func initConfig() {
+	godotenv.Load()
+	err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("failed to init config -- %v", err)
+	}
+}
+
+func initServices() {
+	cfg := config.GetConfig()
 	err := util.InitLogger()
 	if err != nil {
-		log.Fatal("Failed to init logger")
+		log.Fatalf("failed to init logger -- %v", err)
 	}
-	logger := util.GetLogger()
-	//load the config
-	logger.Info("setting up config")
-	err = config.LoadConfig()
+
+	err = util.InitDB(ctx, cfg.ServerConfig.MongoURI)
 	if err != nil {
-		logger.Fatal("failed to load config", zap.Error(err))
+		log.Fatalf("failed to init db -- %v", err)
 	}
+
+	err = util.InitCache(ctx, cfg.ServerConfig.RedisURI, cfg.ServerConfig.RedisPassword)
+	if err != nil {
+		log.Fatalf("failed to init cache -- %v", err)
+	}
+}
+
+func initServer() {
 	cfg := config.GetConfig()
-
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
-	defer cancel()
-
-	//setup database
-	logger.Info("starting database")
-	err = util.InitDB(ctx)
-	if err != nil {
-		logger.Fatal("failed to init db", zap.Error(err))
-	}
-
-	db := util.GetDB()
-	defer db.Disconnect(context.Background())
-
-	err = util.InitCache(ctx)
-	if err != nil {
-		logger.Fatal("failed to init cache", zap.Error(err))
-	}
-
-	//setup server
-	logger.Info("starting server")
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -65,16 +66,22 @@ func main() {
 	r.Use(middleware.Timeout(reqTimeout))
 	r.Use(httprate.Limit(requestLimit, limitTimeout, httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint)))
 
+	//routers
 	r.Route("/auth", auth.ProcessRoutes)
 	r.Route("/v1", v1.ProcessRoutes)
 
+	var err error
 	if cfg.ServerConfig.TLS {
 		err = http.ListenAndServeTLS(cfg.ServerConfig.IpAddress+":"+cfg.ServerConfig.Port, cfg.ServerConfig.CertPath, cfg.ServerConfig.KeyPath, r)
 	} else {
 		err = http.ListenAndServe(cfg.ServerConfig.IpAddress+":"+cfg.ServerConfig.Port, r)
 	}
 	if err != nil {
-		logger.Fatal("failed to init server", zap.Error(err))
+		log.Fatalf("failed to init server -- %v", err)
 	}
+}
 
+func cleanupServices() {
+	cancel()
+	util.DB().Disconnect(context.Background())
 }

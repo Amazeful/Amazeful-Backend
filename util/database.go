@@ -3,24 +3,20 @@ package util
 import (
 	"context"
 
-	"github.com/Amazeful/Amazeful-Backend/config"
 	"github.com/Amazeful/dataful"
 )
 
 var db dataful.Database
 
 //InitDB initializes the db
-func InitDB(ctx context.Context) error {
-	database, err := dataful.NewMongoDB(ctx, config.GetConfig().ServerConfig.MongoURI)
-	if err != nil {
-		return err
-	}
+func InitDB(ctx context.Context, uri string) error {
+	var err error
+	db, err = dataful.NewMongoDB(ctx, uri)
 
-	db = database
-	return nil
+	return err
 }
 
-//GetDB returns global DB
-func GetDB() dataful.Database {
+//DB returns global DB
+func DB() dataful.Database {
 	return db
 }

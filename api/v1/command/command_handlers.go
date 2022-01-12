@@ -26,7 +26,7 @@ func HandleGetCommand(rw http.ResponseWriter, req *http.Request) {
 
 //HandleCreateCommand creates a new command.
 func HandleCreateCommand(rw http.ResponseWriter, req *http.Request) {
-	r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
+	r := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
 	command := models.NewCommand(r)
 	err := json.NewDecoder(req.Body).Decode(command)
 	if err != nil {
@@ -54,7 +54,7 @@ func HandleUpdateCommand(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r := util.GetDB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
+	r := util.DB().Repository(dataful.DBAmazeful, dataful.CollectionCommand)
 	updatedCommand := models.NewCommand(r)
 
 	err := json.NewDecoder(req.Body).Decode(updatedCommand)
