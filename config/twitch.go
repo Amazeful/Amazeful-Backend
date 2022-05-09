@@ -1,8 +1,8 @@
 package config
 
 import (
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/twitch"
+	"github.com/caarlos0/env/v6"
+	validator "github.com/go-playground/validator/v10"
 )
 
 type TwitchConfig struct {
@@ -11,16 +11,23 @@ type TwitchConfig struct {
 	State        string `env:"TWITCH_STATE" validate:"required"`
 }
 
-func (c *Config) GetTwitchOauthConfig() *oauth2.Config {
-	return &oauth2.Config{
-		ClientID:     c.TwitchConfig.ClientID,
-		ClientSecret: c.TwitchConfig.ClientSecret,
-		Endpoint:     twitch.Endpoint,
-		RedirectURL:  c.ServerConfig.ServerURL + "/auth/twitch/callback",
-		Scopes:       []string{"user:read:email"},
+func NewTwitchConfig(serverUrl string) *TwitchConfig {
+	return &TwitchConfig{
+		State: "test_state",
 	}
 }
 
-var defaultTwitchConfig = &TwitchConfig{
-	State: "test_state",
+func (tc *TwitchConfig) Load() error {
+	err := env.Parse(tc)
+	if err != nil {
+		return err
+	}
+
+	validate := validator.New()
+	err = validate.Struct(tc)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

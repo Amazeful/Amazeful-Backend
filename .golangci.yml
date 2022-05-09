@@ -1,0 +1,19 @@
+output:
+  format: colored-line-number
+  sort-results: true
+
+linters:
+  enable:
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - cyclop
+    - decorder
+    - dupl
+    - forcetypeassert
+    - funlen
+    - goimports
+    - tagliatelle
+    - revive
+    - gosec
+

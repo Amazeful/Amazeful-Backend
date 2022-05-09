@@ -1,5 +1,10 @@
 package config
 
+import (
+	"github.com/caarlos0/env/v6"
+	validator "github.com/go-playground/validator/v10"
+)
+
 type ServerConfig struct {
 	IpAddress     string `env:"IP" validate:"required,ip"`
 	ServerURL     string `env:"SERVER_URL" validate:"required,url"`
@@ -13,11 +18,28 @@ type ServerConfig struct {
 	JwtSignKey    string `env:"JWT_SIGN_KEY" validate:"required"`
 }
 
-var defaultServerConfig = &ServerConfig{
-	IpAddress:  "127.0.0.1",
-	ServerURL:  "http://localhost:8000",
-	MongoURI:   "localhost:27017",
-	RedisURI:   "localhost:6379",
-	Port:       "8000",
-	JwtSignKey: "test_key",
+func NewServerConfig() *ServerConfig {
+	return &ServerConfig{
+		IpAddress:  "127.0.0.1",
+		ServerURL:  "http://localhost:8000",
+		MongoURI:   "localhost:27017",
+		RedisURI:   "localhost:6379",
+		Port:       "8000",
+		JwtSignKey: "test_key",
+	}
+}
+
+func (sc *ServerConfig) Load() error {
+	err := env.Parse(sc)
+	if err != nil {
+		return err
+	}
+
+	validate := validator.New()
+	err = validate.Struct(sc)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
